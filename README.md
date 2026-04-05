@@ -44,6 +44,7 @@
 | 🧪 临床前评估 | 毒性预测、PK模拟、合成可行性 | ML + Physics | ✅ |
 | 📊 知识引擎 | 文献挖掘、专利分析、临床数据 | RAG + LLM | ✅ |
 | 🤖 Agent系统 | 自动化DMTA循环、智能决策 | Agentic AI | ✅ |
+| 🧬 一人药企 🆕 | 全流程自动化，30个月→临床 | 哈佛/斯坦福模式 | ✅ |
 
 ---
 
@@ -109,7 +110,8 @@ medi-pharma/
 │   ├── lead_optimization.py  # 先导优化
 │   ├── admet_predictor.py    # ADMET预测
 │   ├── knowledge_engine.py   # 知识引擎
-│   └── orchestrator.py       # Agent编排
+│   ├── orchestrator.py       # Agent编排
+│   └── one_person_pharma.py  # 一人药企Agent 🆕
 ├── backend/                   # API服务
 │   ├── api.py               # REST API
 │   └── models.py            # 数据模型
