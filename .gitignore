@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pyo
+.docking_results/
+screening_results/
+*.egg-info/
+.env
