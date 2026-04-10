@@ -67,7 +67,7 @@ async def health_check():
 async def discover_targets(req: TargetDiscoveryRequest):
     """靶点发现：疾病 → 候选靶点排名"""
     try:
-        from ..target_discovery.engine import TargetDiscoveryEngine
+        from target_discovery.engine import TargetDiscoveryEngine
         engine = TargetDiscoveryEngine()
         report = engine.discover_targets(
             disease=req.disease,
@@ -92,7 +92,7 @@ async def discover_targets(req: TargetDiscoveryRequest):
 async def run_screening(req: ScreeningRequest):
     """虚拟筛选：靶点 → Top候选化合物"""
     try:
-        from ..virtual_screening.engine import VirtualScreeningEngine
+        from virtual_screening.engine import VirtualScreeningEngine
         engine = VirtualScreeningEngine()
         result = engine.screen(
             target_chembl_id=req.target_chembl_id,
@@ -118,7 +118,7 @@ async def run_screening(req: ScreeningRequest):
 async def generate_molecules(req: GenerationRequest):
     """分子生成：从头设计候选分子"""
     try:
-        from ..molecular_generation.engine import MolecularGenerationEngine
+        from molecular_generation.engine import MolecularGenerationEngine
         engine = MolecularGenerationEngine()
         report = engine.generate_candidates(
             target_name=req.target_name,
@@ -144,7 +144,7 @@ async def generate_molecules(req: GenerationRequest):
 async def predict_admet(req: ADMETRequest):
     """ADMET预测：单分子全ADMET评估"""
     try:
-        from ..admet_prediction.engine import ADMETEngine
+        from admet_prediction.engine import ADMETEngine
         engine = ADMETEngine()
         report = engine.predict(req.smiles)
         return ADMETResponse(
@@ -168,7 +168,7 @@ async def predict_admet(req: ADMETRequest):
 async def batch_predict_admet(req: ADMETBatchRequest):
     """ADMET批量预测"""
     try:
-        from ..admet_prediction.engine import ADMETEngine
+        from admet_prediction.engine import ADMETEngine
         engine = ADMETEngine()
         results = engine.batch_predict(req.smiles_list)
         return {"results": results, "total": len(results)}
@@ -181,7 +181,7 @@ async def batch_predict_admet(req: ADMETBatchRequest):
 async def optimize_lead(req: OptimizationRequest):
     """先导优化：分子多参数优化"""
     try:
-        from ..lead_optimization.engine import LeadOptimizationEngine
+        from lead_optimization.engine import LeadOptimizationEngine
         engine = LeadOptimizationEngine()
         result = engine.optimize(
             starting_smiles=req.smiles,
@@ -204,7 +204,7 @@ async def optimize_lead(req: OptimizationRequest):
 async def run_pipeline(req: PipelineRequest):
     """一键全流程：靶点→筛选→生成→优化→ADMET"""
     try:
-        from ..orchestrator.pipeline import PipelineOrchestrator, PipelineConfig
+        from orchestrator.pipeline import PipelineOrchestrator, PipelineConfig
         orchestrator = PipelineOrchestrator()
         config = PipelineConfig(
             disease=req.disease,
@@ -234,7 +234,7 @@ async def run_pipeline(req: PipelineRequest):
 async def knowledge_report(req: KnowledgeRequest):
     """知识分析：靶点-疾病综合报告"""
     try:
-        from ..knowledge_engine.engine import KnowledgeEngine
+        from knowledge_engine.engine import KnowledgeEngine
         engine = KnowledgeEngine()
         report = engine.generate_knowledge_report(
             target=req.target,

@@ -84,7 +84,7 @@ class PipelineOrchestrator:
         if not config.target:
             logger.info("📍 Stage 1: 靶点发现")
             try:
-                from ..target_discovery.engine import TargetDiscoveryEngine
+                from target_discovery.engine import TargetDiscoveryEngine
                 td = TargetDiscoveryEngine(llm_client=self.llm, llm_model=self.model)
                 report = td.discover_targets(
                     disease=config.disease,
@@ -107,7 +107,7 @@ class PipelineOrchestrator:
         # ========== Stage 2: 虚拟筛选 ==========
         logger.info(f"📍 Stage 2: 虚拟筛选 (靶点: {config.target})")
         try:
-            from ..virtual_screening.engine import VirtualScreeningEngine
+            from virtual_screening.engine import VirtualScreeningEngine
             vs = VirtualScreeningEngine()
             screening = vs.screen(
                 target_chembl_id=config.target_chembl_id or config.target,
@@ -123,7 +123,7 @@ class PipelineOrchestrator:
         # ========== Stage 3: 分子生成 ==========
         logger.info("📍 Stage 3: 分子生成")
         try:
-            from ..molecular_generation.engine import MolecularGenerationEngine
+            from molecular_generation.engine import MolecularGenerationEngine
             mg = MolecularGenerationEngine()
             generation = mg.generate_candidates(
                 target_name=config.target,
@@ -138,7 +138,7 @@ class PipelineOrchestrator:
         # ========== Stage 4: ADMET评估 ==========
         logger.info("📍 Stage 4: ADMET评估")
         try:
-            from ..admet_prediction.engine import ADMETEngine
+            from admet_prediction.engine import ADMETEngine
             admet = ADMETEngine()
 
             # 评估生成的top分子
@@ -153,7 +153,7 @@ class PipelineOrchestrator:
         # ========== Stage 5: 先导优化 ==========
         logger.info("📍 Stage 5: 先导优化")
         try:
-            from ..lead_optimization.engine import LeadOptimizationEngine
+            from lead_optimization.engine import LeadOptimizationEngine
             lo = LeadOptimizationEngine()
 
             # 优化ADMET通过的分子

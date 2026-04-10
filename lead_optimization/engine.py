@@ -7,8 +7,8 @@ import logging
 from dataclasses import dataclass, asdict
 from typing import Optional
 
-from ..admet_prediction.engine import ADMETEngine
-from ..molecular_generation.optimizer import MoleculeOptimizer
+from admet_prediction.engine import ADMETEngine
+from molecular_generation.optimizer import MoleculeOptimizer
 
 logger = logging.getLogger(__name__)
 
