@@ -235,3 +235,17 @@ medi-pharma/
 
 *MediPharma v2.0 | 2026年4月*
 *AI驱动的药物发现平台 — 伪装成服务公司的软件公司*
+
+---
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=MoKangMedical/medi-pharma&type=Date)](https://star-history.com/#MoKangMedical/medi-pharma&Date)
+
+## 🤝 Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## 📄 License
+
+MIT License
