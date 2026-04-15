@@ -159,6 +159,17 @@ class PipelineOrchestrator:
             screened = result.screening_report.get("total_screened", 0)
             if screened == 0:
                 logger.warning("⚠️ 虚拟筛选未筛到化合物，但继续（分子生成可补充）")
+            else:
+                # 决策检查点: DecisionEngine评估筛选质量
+                from orchestrator.decision import DecisionEngine
+                de = DecisionEngine(llm_client=self.llm, llm_model=self.model)
+                top_hits = (result.screening_report.get("top_hits") or
+                           result.screening_report.get("hit_list", []))[:5]
+                if top_hits:
+                    portfolio = de.evaluate_portfolio(top_hits, max_select=3)
+                    logger.info(f"🔍 筛选质量决策: {portfolio['recommendation']}")
+                    if portfolio["go_count"] == 0 and portfolio["conditional_count"] == 0:
+                        logger.warning("⚠️ DecisionEngine判定筛选质量不足，但分子生成可补充")
         except Exception as e:
             err = {"stage": "virtual_screening", "error": str(e), "severity": "critical"}
             result.errors.append(err)
