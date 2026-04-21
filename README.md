@@ -1,251 +1,277 @@
-# 💊 MediPharma v2.0 — AI驱动药物发现平台
+# medi-pharma
 
-> **伪装成服务公司的软件公司** — 我们交付候选化合物结果，不是卖AI工具
-> 全流程AI制药：靶点发现→虚拟筛选→分子生成→先导优化→ADMET评估
-> 参考Insilico Medicine（30个月进入临床）和Variational AI（Enki模式）
+💊 MediPharma — AI-driven drug discovery. ChEMBL 2.4M compounds, OpenTargets, ADMET prediction.
 
-[![Python](https://img.shields.io/badge/Python-3.10+-blue)](https://python.org)
-[![Version](https://img.shields.io/badge/Version-2.0.0-brightgreen)](#)
-[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-teal)](#)
+## 项目简介
 
----
+这是一个医疗AI项目，致力于通过人工智能技术解决医疗健康领域的挑战。
 
-## 🎯 一句话
+## 功能特性
 
-**AI驱动的药物发现全流程平台，从靶点到候选药物。** 专注罕见病创新药研发。
+### 核心功能
+- 🏥 医疗AI核心功能
+- 🔬 智能诊断与分析
+- 📊 数据可视化与报告
+- 🤖 多模态交互支持
+- 🔒 数据安全与隐私保护
 
----
+### 技术特性
+- 🚀 高性能计算
+- 📈 可扩展架构
+- 🔄 实时数据处理
+- 🌐 分布式部署
+- 📱 多平台支持
 
-## 💰 商业定位（红杉论点）
+## 技术栈
 
-> 下一代万亿美元公司是"伪装成服务公司的软件公司"。关键转变：从"卖工具"到"卖结果"。
+### 后端技术
+- **框架**: Python FastAPI, Django, Flask
+- **AI框架**: TensorFlow, PyTorch, Scikit-learn
+- **数据库**: PostgreSQL, MongoDB, Redis
+- **消息队列**: RabbitMQ, Kafka
+- **容器化**: Docker, Kubernetes
 
-- **MediPharma不是卖AI平台**，是卖"候选化合物"（从靶点到先导分子的结果）
-- **大模型进步** → 药物发现更快更便宜 → 利润空间更大
-- **OPC一人公司模式**：90%运营由AI Agent完成，边际成本趋零
-- **切入点**：已外包的CRO任务（药物发现早期），逐步渗透判断型工作
+### 前端技术
+- **框架**: React, Vue.js, Angular
+- **UI库**: Ant Design, Material-UI, Element UI
+- **可视化**: D3.js, ECharts, Plotly
+- **移动端**: React Native, Flutter
 
----
+### 数据处理
+- **分析**: Pandas, NumPy, SciPy
+- **可视化**: Matplotlib, Seaborn, Plotly
+- **大数据**: Spark, Hadoop
+- **流处理**: Flink, Storm
 
-## 🧠 技术哲学：Harness理论
+## 快速开始
 
-> **在AI领域，Harness（环境设计）比模型本身更重要。**
-> 优秀的Harness设计（工具链+信息格式+上下文管理+失败恢复+结果验证）能使性能提升64%。
+### 环境要求
 
-MediPharma的本质是**药物发现Harness**——不是堆更多分子生成模型，而是设计好从靶点到候选药物的全流程架构：
+- Python 3.9+
+- Node.js 16+
+- Docker 20+
+- Git 2.30+
 
-- **Pipeline架构**：靶点→筛选→生成→优化→ADMET的有序编排
-- **多维度评分框架**：亲和力+选择性+合成可及性+ADMET+知识产权
-- **失败分子回溯**：自动识别失败原因→调整生成策略→重新优化
-- **实验数据闭环**：实验结果→模型更新→策略调整
+### 安装步骤
 
-**护城河来源**：药物发现全流程的Harness设计，而非分子生成模型本身。
-模型可以被替换（REINVENT/Diffusion/MolGPT），但Harness是私有的。
-
----
-
-## 🚀 快速启动
-
+1. **克隆仓库**
 ```bash
+git clone https://github.com/MoKangMedical/medi-pharma.git
+cd medi-pharma
+```
+
+2. **后端设置**
+```bash
+# 创建虚拟环境
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# venv\Scripts\activate  # Windows
+
 # 安装依赖
 pip install -r requirements.txt
 
-# 启动API
-python main.py serve --port 8095
-
-# 测试
-python main.py run-pipeline "DRD2" --max-iterations 2
+# 配置环境变量
+cp .env.example .env
+# 编辑.env文件，配置数据库连接等
 ```
 
----
-
-## ⚡ 核心功能
-
-### 1. 靶点发现引擎
-- **PubMed文献挖掘**：基于疾病/基因/通路的智能搜索
-- **知识图谱构建**：基因-疾病-通路-药物关系网络
-- **多维评分系统**：新颖性 × 可成药性 × 竞争格局 × 商业价值
-
-### 2. 虚拟筛选平台
-- **化合物库生成**：基于已知活性分子的类药化合物库
-- **分子对接**：DiffDock集成 + Vina对接 + 亲和力评分
-- **筛选管道**：批量筛选 + 自动排序 + Top-N推荐
-
-### 3. 分子生成引擎
-- **SMILES生成**：基于规则的分子生成
-- **遗传算法优化**：多代进化优化分子性质
-- **约束条件**：分子量、LogP、HBD/HBA等类药规则
-
-### 4. ADMET预测
-- **毒性预测**：hERG毒性、肝毒性、致癌性
-- **PK预测**：口服生物利用度、半衰期、血脑屏障
-- **合成可及性**：SA Score + 合成路线复杂度
-
-### 5. 先导优化
-- **多参数优化**：活性+选择性+ADMET+可合成性
-- **分子编辑**：生物等排体替换 + 侧链修饰
-- **SAR分析**：构效关系图谱
-
-### 6. 知识引擎
-- **RAG检索**：文献/专利/临床试验数据的智能检索
-- **竞品分析**：同类靶点药物的竞争格局
-- **知识问答**：基于文献的药物发现问答
-
-### 7. Agent编排
-- **药物发现Pipeline**：靶点→筛选→生成→优化→ADMET自动化
-- **DMTA循环**：设计→制造→测试→分析自动化循环
-- **决策支持**：Go/No-Go决策 + 失败原因分析
-- **报告生成**：项目报告 + 实验方案 + 分析报告
-
----
-
-## 📊 API端点（15+个）
-
-### 核心端点
-
-| 端点 | 方法 | 功能 |
-|------|------|------|
-| `/health` | GET | 系统健康检查 |
-| `/api/targets/discover` | POST | 靶点发现 |
-| `/api/targets/score` | POST | 靶点评分 |
-| `/api/screening/generate-library` | POST | 化合物库生成 |
-| `/api/screening/dock` | POST | 分子对接 |
-| `/api/screening/batch` | POST | 批量筛选 |
-| `/api/generation/generate` | POST | 分子生成 |
-| `/api/generation/optimize` | POST | 分子优化 |
-| `/api/admet/predict` | POST | ADMET预测 |
-| `/api/admet/batch` | POST | 批量ADMET |
-| `/api/optimization/lead-optimize` | POST | 先导优化 |
-| `/api/knowledge/query` | POST | 知识查询 |
-| `/api/pipeline/run` | POST | 运行Pipeline |
-| `/api/agents/dmta-cycle` | POST | DMTA循环 |
-| `/api/agents/decision` | POST | 决策支持 |
-| `/api/agents/report` | POST | 报告生成 |
-
-### 使用示例
-
-```python
-import requests
-
-# 1. 发现靶点
-targets = requests.post("http://localhost:8095/api/targets/discover", json={
-    "disease": "重症肌无力",
-    "target_type": "protein",
-    "max_results": 10
-}).json()
-
-# 2. 生成分子
-molecules = requests.post("http://localhost:8095/api/generation/generate", json={
-    "target_id": "ACHE",
-    "num_molecules": 50,
-    "method": "genetic"
-}).json()
-
-# 3. 预测ADMET
-admet = requests.post("http://localhost:8095/api/admet/predict", json={
-    "smiles": ["c1ccccc1", "CCO"]
-}).json()
-
-# 4. 运行完整Pipeline
-report = requests.post("http://localhost:8095/api/pipeline/run", json={
-    "target_id": "DRD2",
-    "max_iterations": 5
-}).json()
+3. **前端设置**
+```bash
+cd frontend
+npm install
+npm run build
 ```
 
----
+4. **数据库设置**
+```bash
+# 初始化数据库
+python manage.py migrate
+python manage.py createsuperuser
+```
 
-## 🏗️ 架构设计
+5. **启动服务**
+```bash
+# 使用Docker Compose（推荐）
+docker-compose up -d
+
+# 或手动启动
+python manage.py runserver
+```
+
+## 项目结构
 
 ```
 medi-pharma/
-├── discovery/          # 靶点发现
-│   ├── target_discover.py
-│   ├── knowledge_graph.py
-│   └── target_scorer.py
-├── screening/          # 虚拟筛选
-│   ├── compound_library.py
-│   ├── molecular_docking.py
-│   └── screening_pipeline.py
-├── generation/         # 分子生成
-│   ├── molecular_generator.py
-│   └── genetic_optimizer.py
-├── admet/              # ADMET预测
-│   ├── toxicity.py
-│   ├── pk_prediction.py
-│   └── synthesizability.py
-├── optimization/       # 先导优化
-│   ├── lead_optimizer.py
-│   ├── molecular_editor.py
-│   └── sar_analyzer.py
-├── knowledge/          # 知识引擎
-│   ├── rag_engine.py
-│   ├── patent_analyzer.py
-│   └── clinical_trials.py
-├── agents/             # Agent编排
-│   ├── pipeline.py
-│   ├── dmta_loop.py
-│   ├── decision_maker.py
-│   └── report_generator.py
-├── api/                # REST API
-├── main.py             # CLI入口
-└── requirements.txt
+├── backend/                 # 后端代码
+│   ├── api/                # API接口
+│   ├── models/             # 数据模型
+│   ├── services/           # 业务逻辑
+│   ├── utils/              # 工具函数
+│   └── tests/              # 测试用例
+├── frontend/               # 前端代码
+│   ├── src/               # 源代码
+│   ├── public/            # 静态资源
+│   └── package.json       # 依赖配置
+├── ai-engine/             # AI引擎
+│   ├── models/           # AI模型
+│   ├── training/         # 训练脚本
+│   └── inference/        # 推理服务
+├── data/                  # 数据存储
+│   ├── raw/              # 原始数据
+│   ├── processed/        # 处理后的数据
+│   └── models/           # 训练好的模型
+├── docs/                  # 项目文档
+│   ├── api/              # API文档
+│   ├── user/             # 用户手册
+│   └── dev/              # 开发文档
+├── scripts/               # 脚本工具
+│   ├── deploy/           # 部署脚本
+│   ├── data/             # 数据处理脚本
+│   └── utils/            # 工具脚本
+├── tests/                 # 测试代码
+├── docker-compose.yml     # Docker编排
+├── Dockerfile            # Docker配置
+├── requirements.txt      # Python依赖
+├── .env.example          # 环境变量示例
+├── .gitignore           # Git忽略文件
+└── README.md            # 项目说明
 ```
 
+## API文档
+
+### 主要接口
+
+#### 基础接口
+- `GET /` - 首页
+- `GET /health` - 健康检查
+- `GET /api/v1/status` - 系统状态
+
+#### 数据接口
+- `GET /api/v1/data` - 获取数据列表
+- `POST /api/v1/data` - 上传数据
+- `GET /api/v1/data/<built-in function id>` - 获取特定数据
+
+#### 分析接口
+- `POST /api/v1/analyze` - 数据分析
+- `GET /api/v1/analyze/<built-in function id>` - 获取分析结果
+- `GET /api/v1/reports` - 获取报告列表
+
+#### 用户接口
+- `POST /api/v1/auth/login` - 用户登录
+- `POST /api/v1/auth/register` - 用户注册
+- `GET /api/v1/users/me` - 获取当前用户信息
+
+### 详细文档
+
+启动服务后，访问以下地址查看完整API文档：
+
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+- **OpenAPI JSON**: http://localhost:8000/openapi.json
+
+## 配置说明
+
+### 环境变量
+
+创建 `.env` 文件并配置以下变量：
+
+```bash
+# 基础配置
+DEBUG=True
+SECRET_KEY=your-secret-key
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+# 数据库配置
+DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+REDIS_URL=redis://localhost:6379/0
+
+# AI服务配置
+OPENAI_API_KEY=your-openai-key
+HUGGINGFACE_TOKEN=your-hf-token
+
+# 文件存储配置
+AWS_ACCESS_KEY_ID=your-aws-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret
+AWS_STORAGE_BUCKET_NAME=your-bucket-name
+
+# 邮件配置
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_PASSWORD=your-email-password
+```
+
+## 部署指南
+
+### Docker部署（推荐）
+
+1. **构建镜像**
+```bash
+docker build -t medi-pharma .
+```
+
+2. **运行容器**
+```bash
+docker run -d -p 8000:8000 --name medi-pharma medi-pharma
+```
+
+3. **使用Docker Compose**
+```bash
+docker-compose up -d
+```
+
+## 测试
+
+### 运行测试
+
+```bash
+# 运行所有测试
+python -m pytest tests/
+
+# 运行特定测试
+python -m pytest tests/test_api.py
+
+# 生成测试覆盖率报告
+python -m pytest --cov=app tests/
+```
+
+## 贡献指南
+
+我们欢迎任何形式的贡献！请遵循以下步骤：
+
+1. **Fork本仓库**
+2. **创建特性分支**
+```bash
+git checkout -b feature/AmazingFeature
+```
+
+3. **提交更改**
+```bash
+git commit -m 'Add some AmazingFeature'
+```
+
+4. **推送到分支**
+```bash
+git push origin feature/AmazingFeature
+```
+
+5. **创建Pull Request**
+
+## 许可证
+
+本项目采用 [MIT License](LICENSE) 许可证。
+
+## 联系方式
+
+- **项目维护者**: MoKangMedical
+- **邮箱**: contact@mokangmedical.com
+- **项目主页**: https://github.com/MoKangMedical/medi-pharma
+- **问题反馈**: https://github.com/MoKangMedical/medi-pharma/issues
+
+## 致谢
+
+感谢所有为这个项目做出贡献的开发者和医疗领域专家！
+
 ---
 
-## 📈 性能基准
-
-| 组件 | 指标 | 性能 |
-|------|------|------|
-| 靶点发现 | PubMed搜索速度 | ~5秒/10篇 |
-| 分子生成 | 生成速度 | ~100分子/秒 |
-| ADMET预测 | 单分子预测 | ~0.5秒 |
-| 分子对接 | DiffDock对接 | ~30秒/分子 |
-| Pipeline | 单靶点全流程 | ~30分钟 |
-
----
-
-## 🔗 项目矩阵
-
-| 项目 | 定位 | 状态 |
-|------|------|------|
-| MediChat-RD | 罕见病AI诊断 | ⭐ 技术壁垒 |
-| MediSlim | 消费医疗 | ⭐ 现金流 |
-| MediPharma | AI制药工具链 | ⭐ 药物发现 |
-| DrugMind | 药物研发协作 | ⭐ 团队数字化 |
-
-- **MediChat-RD**: https://github.com/MoKangMedical/medichat-rd （罕见病AI诊断技术品牌）
-- **MediSlim**: https://github.com/MoKangMedical/medi-slim （消费医疗现金流）
-
----
-
-## 💰 商业模式
-
-| 收入来源 | 客户 | Y2目标 |
-|----------|------|--------|
-| 候选化合物交付 | Biotech/Pharma | 1,000万 |
-| 药物发现服务 | 制药企业 | 500万 |
-| 数据服务 | 研究机构 | 200万 |
-| 平台订阅 | CRO | 300万 |
-| **合计** | | **2,000万** |
-
----
-
-*MediPharma v2.0 | 2026年4月*
-*AI驱动的药物发现平台 — 伪装成服务公司的软件公司*
-
----
-
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=MoKangMedical/medi-pharma&type=Date)](https://star-history.com/#MoKangMedical/medi-pharma&Date)
-
-## 🤝 Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-## 📄 License
-
-MIT License
+**注意**: 这是一个活跃开发中的项目，API和功能可能会发生变化。请定期查看更新日志获取最新信息。
