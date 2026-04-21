@@ -5,3 +5,9 @@ __pycache__/
 screening_results/
 *.egg-info/
 .env
+.env.local
+.env.*.local
+*.key
+*.pem
+*_secret*
+credentials.json
