@@ -1,51 +1,402 @@
 [
-  {"name":"奥希替尼","smiles":"COc1cc(NC(=O)C=C)cc(c1Nc2nccc(-c3cn(C)c4ncccc34)n2)OC","target":"EGFR","ic50_nm":1.1,"phase":"上市","indication":"非小细胞肺癌"},
-  {"name":"索托拉西布","smiles":"CC(C)(C)c1nc(c(s1)c2ccnc(N3CCOCC3)n2)NC(=O)c4cccc(c4)C(F)(F)F","target":"KRAS G12C","ic50_nm":0.8,"phase":"上市","indication":"非小细胞肺癌"},
-  {"name":"奥拉帕利","smiles":"c1ccc2c(c1)nc(n2)N3CCN(CC3)C(=O)c4ccc(cc4)F","target":"PARP1/2","ic50_nm":1.4,"phase":"上市","indication":"卵巢癌/乳腺癌"},
-  {"name":"伊布替尼","smiles":"CC#Cc1cnc2n(c(=O)n(c2n1)CCN3CCOCC3)C4CCCCC4","target":"BTK","ic50_nm":0.5,"phase":"上市","indication":"套细胞淋巴瘤"},
-  {"name":"帕博西利","smiles":"CC(C)c1c(c(c(n1c2ccc(cc2)C(=O)Nc3ccc(cc3)F)C#N)C(=O)N4CCNCC4)C","target":"CDK4/6","ic50_nm":11.0,"phase":"上市","indication":"乳腺癌"},
-  {"name":"阿帕替尼","smiles":"COc1cc2c(cc1OC)nc(nc2Oc3ccc(cc3)C#N)NC(=O)c4ccc(cc4)N(C)C","target":"VEGFR2","ic50_nm":2.0,"phase":"上市","indication":"胃癌"},
-  {"name":"吉非替尼","smiles":"COc1cc2ncnc(c2cc1OCCCN3CCOCC3)Nc4ccc(c(c4)Cl)F","target":"EGFR","ic50_nm":33.0,"phase":"上市","indication":"非小细胞肺癌"},
-  {"name":"厄洛替尼","smiles":"COCCOc1cc2c(cc1OCCOC)ncnc2Nc3ccc(c(c3)Cl)F","target":"EGFR","ic50_nm":2.0,"phase":"上市","indication":"非小细胞肺癌"},
-  {"name":"达沙替尼","smiles":"Cc1ccc(c(c1)NC(=O)c2cnc(s2)Nc3cc(cc(c3)C)C(=O)N)Cl","target":"BCR-ABL","ic50_nm":0.6,"phase":"上市","indication":"慢性髓性白血病"},
-  {"name":"维莫非尼","smiles":"Cc1cc(c(c(c1Cl)F)NC(=O)/C=C/c2ccc(cc2)S(=O)(=O)C(F)(F)F)Cl","target":"BRAF V600E","ic50_nm":31.0,"phase":"上市","indication":"黑色素瘤"},
-  {"name":"曲美替尼","smiles":"COC(CNc1nc(nc(c1c2ccc(cc2)OC)OC)NC(=O)C3CC3)c4ccc(cc4)F","target":"MEK1/2","ic50_nm":0.7,"phase":"上市","indication":"黑色素瘤"},
-  {"name":"来那替尼","smiles":"COc1cc2c(c(c1OC)OC)ncnc2Nc3ccc(c(c3)Cl)C(=O)C=C","target":"HER2","ic50_nm":59.0,"phase":"上市","indication":"乳腺癌"},
-  {"name":"阿法替尼","smiles":"C=CC(=O)Nc1cc2c(cc1Cl)ncnc2Nc3ccc(c(c3)F)F","target":"EGFR","ic50_nm":0.5,"phase":"上市","indication":"非小细胞肺癌"},
-  {"name":"拉罗替尼","smiles":"Cc1c(c(c(n1c2ccc(cc2)F)C#N)C(=O)N3CCNCC3)C","target":"NTRK","ic50_nm":2.7,"phase":"上市","indication":"NTRK融合实体瘤"},
-  {"name":"塞尔帕替尼","smiles":"COc1cc2c(cc1OC)ncnc2Nc3ccc(cc3)C(=O)N4CC(C4)O","target":"RET","ic50_nm":0.9,"phase":"上市","indication":"RET融合肺癌"},
-  {"name":"司美格鲁肽片段1","smiles":"CCCCCCCCCCCCCCCCC(=O)O","target":"GLP-1R","ic50_nm":0.1,"phase":"上市","indication":"2型糖尿病/肥胖"},
-  {"name":"利伐沙班","smiles":"Cc1c(c(c(n1c2ccc(cc2)F)C(=O)Nc3ccc(cc3)Cl)C#N)C(=O)N4CCOCC4","target":"FXa","ic50_nm":0.4,"phase":"上市","indication":"深静脉血栓"},
-  {"name":"阿哌沙班","smiles":"Cc1c(c(c(n1c2ccc(cc2)F)C(=O)Nc3ccccc3)C#N)C(=O)N4CCOCC4","target":"FXa","ic50_nm":0.1,"phase":"上市","indication":"房颤/血栓"},
-  {"name":"恩格列净","smiles":"Oc1ccc(cc1)c2oc3c(c(c2)COc4ccc(cc4)Cl)cc(cc3)O","target":"SGLT2","ic50_nm":2.6,"phase":"上市","indication":"2型糖尿病"},
-  {"name":"达格列净","smiles":"Oc1ccc(cc1)c2oc3c(c(c2)COc4ccc(cc4)Cl)cc(cc3)O","target":"SGLT2","ic50_nm":1.1,"phase":"上市","indication":"2型糖尿病/心衰"},
-  {"name":"阿美替尼","smiles":"COc1cc2ncnc(c2cc1N3CCNCC3)Nc4ccc(c(c4)Cl)F","target":"EGFR T790M","ic50_nm":1.5,"phase":"上市","indication":"非小细胞肺癌"},
-  {"name":"呋喹替尼","smiles":"COc1cc2c(cc1OC)ncnc2Nc3ccc(cc3)C(=O)Nc4ccc(cc4)F","target":"VEGFR1/2/3","ic50_nm":25.0,"phase":"上市","indication":"结直肠癌"},
-  {"name":"安罗替尼","smiles":"COc1cc2ncnc(c2cc1OCCCN3CCOCC3)Nc4ccc(c(c4)Cl)C#N","target":"VEGFR","ic50_nm":1.2,"phase":"上市","indication":"非小细胞肺癌"},
-  {"name":"仑伐替尼","smiles":"COc1cc2c(cc1OC)ncnc2Nc3ccc(c(c3)Cl)C(=O)NC4CC4","target":"VEGFR","ic50_nm":4.0,"phase":"上市","indication":"肝癌/甲状腺癌"},
-  {"name":"卡瑞利珠单抗片段","smiles":"N/A","target":"PD-1","ic50_nm":0.5,"phase":"上市","indication":"多种实体瘤"},
-  {"name":"信迪利单抗片段","smiles":"N/A","target":"PD-1","ic50_nm":0.3,"phase":"上市","indication":"霍奇金淋巴瘤"},
-  {"name":"替雷利珠单抗片段","smiles":"N/A","target":"PD-1","ic50_nm":0.4,"phase":"上市","indication":"尿路上皮癌"},
-  {"name":"度伐利尤单抗片段","smiles":"N/A","target":"PD-L1","ic50_nm":0.1,"phase":"上市","indication":"非小细胞肺癌"},
-  {"name":"戈沙妥珠单抗片段","smiles":"N/A","target":"TROP2","ic50_nm":2.6,"phase":"上市","indication":"三阴性乳腺癌"},
-  {"name":"T-DXd片段","smiles":"N/A","target":"HER2","ic50_nm":1.0,"phase":"上市","indication":"HER2低表达乳腺癌"},
-  {"name":"吡咯替尼","smiles":"COc1cc2ncnc(c2cc1OCCCN3CCOCC3)Nc4ccc(c(c4)Cl)C(=O)C=C","target":"HER2","ic50_nm":13.0,"phase":"上市","indication":"乳腺癌"},
-  {"name":"泽布替尼","smiles":"Cc1c(c(c(n1c2ccc(cc2)F)C#N)C(=O)N3CCNCC3)C","target":"BTK","ic50_nm":0.3,"phase":"上市","indication":"套细胞淋巴瘤"},
-  {"name":"奥布替尼","smiles":"CC#Cc1cnc2n(c(=O)n(c2n1)CCN3CCOCC3)C4CCCCC4","target":"BTK","ic50_nm":0.2,"phase":"上市","indication":"套细胞淋巴瘤"},
-  {"name":"氟马替尼","smiles":"Cc1ccc(c(c1)NC(=O)c2cnc(s2)Nc3cc(cc(c3)C)C(=O)N)Cl","target":"BCR-ABL","ic50_nm":1.2,"phase":"上市","indication":"慢性髓性白血病"},
-  {"name":"瑞派替尼","smiles":"COc1cc2c(cc1OC)ncnc2Nc3ccc(cc3)C(=O)N4CCNCC4","target":"KIT/PDGFRA","ic50_nm":2.0,"phase":"上市","indication":"胃肠间质瘤"},
-  {"name":"阿伐替尼","smiles":"COc1cc2c(cc1OC)ncnc2Nc3ccc(cc3)C(=O)N4CCOCC4","target":"KIT/PDGFRA","ic50_nm":0.5,"phase":"上市","indication":"胃肠间质瘤"},
-  {"name":"佩米替尼","smiles":"COc1cc2c(cc1OC)ncnc2Nc3ccc(cc3)C(=O)N4CCNCC4","target":"FGFR","ic50_nm":0.4,"phase":"上市","indication":"胆管癌"},
-  {"name":"厄达替尼","smiles":"COc1cc2c(cc1OC)ncnc2Nc3ccc(cc3)C(=O)N4CCC4","target":"FGFR","ic50_nm":0.5,"phase":"上市","indication":"膀胱癌"},
-  {"name":"艾伏尼布","smiles":"C1CCC(CC1)C(=O)Nc2ccc(cc2)C3CCNCC3","target":"IDH1","ic50_nm":12.0,"phase":"上市","indication":"急性髓系白血病"},
-  {"name":"恩西地平","smiles":"c1ccc2c(c1)nc(n2)N3CCNCC3","target":"IDH2","ic50_nm":13.0,"phase":"上市","indication":"急性髓系白血病"},
-  {"name":"尼拉帕利","smiles":"Cc1c(c(c(n1c2ccc(cc2)F)C#N)C(=O)N3CCNCC3)C","target":"PARP","ic50_nm":0.9,"phase":"上市","indication":"卵巢癌"},
-  {"name":"氟唑帕利","smiles":"c1ccc2c(c1)nc(n2)N3CCN(CC3)C(=O)c4ccc(cc4)F","target":"PARP","ic50_nm":1.0,"phase":"上市","indication":"卵巢癌"},
-  {"name":"他泽司他","smiles":"c1ccc2c(c1)nc(n2)N3CCNCC3","target":"EZH2","ic50_nm":2.5,"phase":"上市","indication":"上皮样肉瘤"},
-  {"name":"西达本胺","smiles":"c1ccc2c(c1)nc(n2)N3CCNCC3","target":"HDAC","ic50_nm":50.0,"phase":"上市","indication":"外周T细胞淋巴瘤"},
-  {"name":"阿扎胞苷","smiles":"c1nc(n(c1)C2C(C(C(O2)CO)O)O)NC","target":"DNA甲基化","ic50_nm":1000.0,"phase":"上市","indication":"骨髓增生异常综合征"},
-  {"name":"维奈克拉","smiles":"Cc1c(c(c(n1c2ccc(cc2)F)C#N)C(=O)N3CCNCC3)C","target":"BCL-2","ic50_nm":0.3,"phase":"上市","indication":"慢性淋巴细胞白血病"},
-  {"name":"塞利尼索","smiles":"c1ccc2c(c1)nc(n2)N3CCNCC3","target":"XPO1","ic50_nm":10.0,"phase":"上市","indication":"多发性骨髓瘤"},
-  {"name":"芦可替尼","smiles":"Cc1c(c(c(n1c2ccc(cc2)F)C#N)C(=O)N3CCNCC3)C","target":"JAK1/2","ic50_nm":3.2,"phase":"上市","indication":"骨髓纤维化"},
-  {"name":"巴瑞替尼","smiles":"Cc1c(c(c(n1c2ccc(cc2)F)C#N)C(=O)N3CCNCC3)C","target":"JAK1/2","ic50_nm":0.5,"phase":"上市","indication":"类风湿关节炎"}
+  {
+    "name": "奥希替尼",
+    "smiles": "COc1cc(NC(=O)C=C)cc(c1Nc2nccc(-c3cn(C)c4ncccc34)n2)OC",
+    "target": "EGFR",
+    "ic50_nm": 1.1,
+    "phase": "上市",
+    "indication": "非小细胞肺癌"
+  },
+  {
+    "name": "索托拉西布",
+    "smiles": "CC(C)(C)c1nc(c(s1)c2ccnc(N3CCOCC3)n2)NC(=O)c4cccc(c4)C(F)(F)F",
+    "target": "KRAS G12C",
+    "ic50_nm": 0.8,
+    "phase": "上市",
+    "indication": "非小细胞肺癌"
+  },
+  {
+    "name": "奥拉帕利",
+    "smiles": "c1ccc2c(c1)nc(n2)N3CCN(CC3)C(=O)c4ccc(cc4)F",
+    "target": "PARP1/2",
+    "ic50_nm": 1.4,
+    "phase": "上市",
+    "indication": "卵巢癌/乳腺癌"
+  },
+  {
+    "name": "伊布替尼",
+    "smiles": "CC#Cc1cnc2n(c(=O)n(c2n1)CCN3CCOCC3)C4CCCCC4",
+    "target": "BTK",
+    "ic50_nm": 0.5,
+    "phase": "上市",
+    "indication": "套细胞淋巴瘤"
+  },
+  {
+    "name": "帕博西利",
+    "smiles": "CC(C)c1c(c(c(n1c2ccc(cc2)C(=O)Nc3ccc(cc3)F)C#N)C(=O)N4CCNCC4)C",
+    "target": "CDK4/6",
+    "ic50_nm": 11.0,
+    "phase": "上市",
+    "indication": "乳腺癌"
+  },
+  {
+    "name": "阿帕替尼",
+    "smiles": "COc1cc2c(cc1OC)nc(nc2Oc3ccc(cc3)C#N)NC(=O)c4ccc(cc4)N(C)C",
+    "target": "VEGFR2",
+    "ic50_nm": 2.0,
+    "phase": "上市",
+    "indication": "胃癌"
+  },
+  {
+    "name": "吉非替尼",
+    "smiles": "COc1cc2ncnc(c2cc1OCCCN3CCOCC3)Nc4ccc(c(c4)Cl)F",
+    "target": "EGFR",
+    "ic50_nm": 33.0,
+    "phase": "上市",
+    "indication": "非小细胞肺癌"
+  },
+  {
+    "name": "厄洛替尼",
+    "smiles": "COCCOc1cc2c(cc1OCCOC)ncnc2Nc3ccc(c(c3)Cl)F",
+    "target": "EGFR",
+    "ic50_nm": 2.0,
+    "phase": "上市",
+    "indication": "非小细胞肺癌"
+  },
+  {
+    "name": "达沙替尼",
+    "smiles": "Cc1ccc(c(c1)NC(=O)c2cnc(s2)Nc3cc(cc(c3)C)C(=O)N)Cl",
+    "target": "BCR-ABL",
+    "ic50_nm": 0.6,
+    "phase": "上市",
+    "indication": "慢性髓性白血病"
+  },
+  {
+    "name": "维莫非尼",
+    "smiles": "Cc1cc(c(c(c1Cl)F)NC(=O)/C=C/c2ccc(cc2)S(=O)(=O)C(F)(F)F)Cl",
+    "target": "BRAF V600E",
+    "ic50_nm": 31.0,
+    "phase": "上市",
+    "indication": "黑色素瘤"
+  },
+  {
+    "name": "曲美替尼",
+    "smiles": "COC(CNc1nc(nc(c1c2ccc(cc2)OC)OC)NC(=O)C3CC3)c4ccc(cc4)F",
+    "target": "MEK1/2",
+    "ic50_nm": 0.7,
+    "phase": "上市",
+    "indication": "黑色素瘤"
+  },
+  {
+    "name": "来那替尼",
+    "smiles": "COc1cc2c(c(c1OC)OC)ncnc2Nc3ccc(c(c3)Cl)C(=O)C=C",
+    "target": "HER2",
+    "ic50_nm": 59.0,
+    "phase": "上市",
+    "indication": "乳腺癌"
+  },
+  {
+    "name": "阿法替尼",
+    "smiles": "C=CC(=O)Nc1cc2c(cc1Cl)ncnc2Nc3ccc(c(c3)F)F",
+    "target": "EGFR",
+    "ic50_nm": 0.5,
+    "phase": "上市",
+    "indication": "非小细胞肺癌"
+  },
+  {
+    "name": "拉罗替尼",
+    "smiles": "Cc1c(c(c(n1c2ccc(cc2)F)C#N)C(=O)N3CCNCC3)C",
+    "target": "NTRK",
+    "ic50_nm": 2.7,
+    "phase": "上市",
+    "indication": "NTRK融合实体瘤"
+  },
+  {
+    "name": "塞尔帕替尼",
+    "smiles": "COc1cc2c(cc1OC)ncnc2Nc3ccc(cc3)C(=O)N4CC(C4)O",
+    "target": "RET",
+    "ic50_nm": 0.9,
+    "phase": "上市",
+    "indication": "RET融合肺癌"
+  },
+  {
+    "name": "司美格鲁肽片段1",
+    "smiles": "CCCCCCCCCCCCCCCCC(=O)O",
+    "target": "GLP-1R",
+    "ic50_nm": 0.1,
+    "phase": "上市",
+    "indication": "2型糖尿病/肥胖"
+  },
+  {
+    "name": "利伐沙班",
+    "smiles": "Cc1c(c(c(n1c2ccc(cc2)F)C(=O)Nc3ccc(cc3)Cl)C#N)C(=O)N4CCOCC4",
+    "target": "FXa",
+    "ic50_nm": 0.4,
+    "phase": "上市",
+    "indication": "深静脉血栓"
+  },
+  {
+    "name": "阿哌沙班",
+    "smiles": "Cc1c(c(c(n1c2ccc(cc2)F)C(=O)Nc3ccccc3)C#N)C(=O)N4CCOCC4",
+    "target": "FXa",
+    "ic50_nm": 0.1,
+    "phase": "上市",
+    "indication": "房颤/血栓"
+  },
+  {
+    "name": "恩格列净",
+    "smiles": "Oc1ccc(cc1)c2oc3c(c(c2)COc4ccc(cc4)Cl)cc(cc3)O",
+    "target": "SGLT2",
+    "ic50_nm": 2.6,
+    "phase": "上市",
+    "indication": "2型糖尿病"
+  },
+  {
+    "name": "达格列净",
+    "smiles": "Oc1ccc(cc1)c2oc3c(c(c2)COc4ccc(cc4)Cl)cc(cc3)O",
+    "target": "SGLT2",
+    "ic50_nm": 1.1,
+    "phase": "上市",
+    "indication": "2型糖尿病/心衰"
+  },
+  {
+    "name": "阿美替尼",
+    "smiles": "COc1cc2ncnc(c2cc1N3CCNCC3)Nc4ccc(c(c4)Cl)F",
+    "target": "EGFR T790M",
+    "ic50_nm": 1.5,
+    "phase": "上市",
+    "indication": "非小细胞肺癌"
+  },
+  {
+    "name": "呋喹替尼",
+    "smiles": "COc1cc2c(cc1OC)ncnc2Nc3ccc(cc3)C(=O)Nc4ccc(cc4)F",
+    "target": "VEGFR1/2/3",
+    "ic50_nm": 25.0,
+    "phase": "上市",
+    "indication": "结直肠癌"
+  },
+  {
+    "name": "安罗替尼",
+    "smiles": "COc1cc2ncnc(c2cc1OCCCN3CCOCC3)Nc4ccc(c(c4)Cl)C#N",
+    "target": "VEGFR",
+    "ic50_nm": 1.2,
+    "phase": "上市",
+    "indication": "非小细胞肺癌"
+  },
+  {
+    "name": "仑伐替尼",
+    "smiles": "COc1cc2c(cc1OC)ncnc2Nc3ccc(c(c3)Cl)C(=O)NC4CC4",
+    "target": "VEGFR",
+    "ic50_nm": 4.0,
+    "phase": "上市",
+    "indication": "肝癌/甲状腺癌"
+  },
+  {
+    "name": "卡瑞利珠单抗片段",
+    "smiles": "N/A",
+    "target": "PD-1",
+    "ic50_nm": 0.5,
+    "phase": "上市",
+    "indication": "多种实体瘤"
+  },
+  {
+    "name": "信迪利单抗片段",
+    "smiles": "N/A",
+    "target": "PD-1",
+    "ic50_nm": 0.3,
+    "phase": "上市",
+    "indication": "霍奇金淋巴瘤"
+  },
+  {
+    "name": "替雷利珠单抗片段",
+    "smiles": "N/A",
+    "target": "PD-1",
+    "ic50_nm": 0.4,
+    "phase": "上市",
+    "indication": "尿路上皮癌"
+  },
+  {
+    "name": "度伐利尤单抗片段",
+    "smiles": "N/A",
+    "target": "PD-L1",
+    "ic50_nm": 0.1,
+    "phase": "上市",
+    "indication": "非小细胞肺癌"
+  },
+  {
+    "name": "戈沙妥珠单抗片段",
+    "smiles": "N/A",
+    "target": "TROP2",
+    "ic50_nm": 2.6,
+    "phase": "上市",
+    "indication": "三阴性乳腺癌"
+  },
+  {
+    "name": "T-DXd片段",
+    "smiles": "N/A",
+    "target": "HER2",
+    "ic50_nm": 1.0,
+    "phase": "上市",
+    "indication": "HER2低表达乳腺癌"
+  },
+  {
+    "name": "吡咯替尼",
+    "smiles": "COc1cc2ncnc(c2cc1OCCCN3CCOCC3)Nc4ccc(c(c4)Cl)C(=O)C=C",
+    "target": "HER2",
+    "ic50_nm": 13.0,
+    "phase": "上市",
+    "indication": "乳腺癌"
+  },
+  {
+    "name": "泽布替尼",
+    "smiles": "Cc1c(c(c(n1c2ccc(cc2)F)C#N)C(=O)N3CCNCC3)C",
+    "target": "BTK",
+    "ic50_nm": 0.3,
+    "phase": "上市",
+    "indication": "套细胞淋巴瘤"
+  },
+  {
+    "name": "奥布替尼",
+    "smiles": "CC#Cc1cnc2n(c(=O)n(c2n1)CCN3CCOCC3)C4CCCCC4",
+    "target": "BTK",
+    "ic50_nm": 0.2,
+    "phase": "上市",
+    "indication": "套细胞淋巴瘤"
+  },
+  {
+    "name": "氟马替尼",
+    "smiles": "Cc1ccc(c(c1)NC(=O)c2cnc(s2)Nc3cc(cc(c3)C)C(=O)N)Cl",
+    "target": "BCR-ABL",
+    "ic50_nm": 1.2,
+    "phase": "上市",
+    "indication": "慢性髓性白血病"
+  },
+  {
+    "name": "瑞派替尼",
+    "smiles": "COc1cc2c(cc1OC)ncnc2Nc3ccc(cc3)C(=O)N4CCNCC4",
+    "target": "KIT/PDGFRA",
+    "ic50_nm": 2.0,
+    "phase": "上市",
+    "indication": "胃肠间质瘤"
+  },
+  {
+    "name": "阿伐替尼",
+    "smiles": "COc1cc2c(cc1OC)ncnc2Nc3ccc(cc3)C(=O)N4CCOCC4",
+    "target": "KIT/PDGFRA",
+    "ic50_nm": 0.5,
+    "phase": "上市",
+    "indication": "胃肠间质瘤"
+  },
+  {
+    "name": "佩米替尼",
+    "smiles": "COc1cc2c(cc1OC)ncnc2Nc3ccc(cc3)C(=O)N4CCNCC4",
+    "target": "FGFR",
+    "ic50_nm": 0.4,
+    "phase": "上市",
+    "indication": "胆管癌"
+  },
+  {
+    "name": "厄达替尼",
+    "smiles": "COc1cc2c(cc1OC)ncnc2Nc3ccc(cc3)C(=O)N4CCC4",
+    "target": "FGFR",
+    "ic50_nm": 0.5,
+    "phase": "上市",
+    "indication": "膀胱癌"
+  },
+  {
+    "name": "艾伏尼布",
+    "smiles": "C1CCC(CC1)C(=O)Nc2ccc(cc2)C3CCNCC3",
+    "target": "IDH1",
+    "ic50_nm": 12.0,
+    "phase": "上市",
+    "indication": "急性髓系白血病"
+  },
+  {
+    "name": "恩西地平",
+    "smiles": "c1ccc2c(c1)nc(n2)N3CCNCC3",
+    "target": "IDH2",
+    "ic50_nm": 13.0,
+    "phase": "上市",
+    "indication": "急性髓系白血病"
+  },
+  {
+    "name": "尼拉帕利",
+    "smiles": "Cc1c(c(c(n1c2ccc(cc2)F)C#N)C(=O)N3CCNCC3)C",
+    "target": "PARP",
+    "ic50_nm": 0.9,
+    "phase": "上市",
+    "indication": "卵巢癌"
+  },
+  {
+    "name": "氟唑帕利",
+    "smiles": "c1ccc2c(c1)nc(n2)N3CCN(CC3)C(=O)c4ccc(cc4)F",
+    "target": "PARP",
+    "ic50_nm": 1.0,
+    "phase": "上市",
+    "indication": "卵巢癌"
+  },
+  {
+    "name": "他泽司他",
+    "smiles": "c1ccc2c(c1)nc(n2)N3CCNCC3",
+    "target": "EZH2",
+    "ic50_nm": 2.5,
+    "phase": "上市",
+    "indication": "上皮样肉瘤"
+  },
+  {
+    "name": "西达本胺",
+    "smiles": "c1ccc2c(c1)nc(n2)N3CCNCC3",
+    "target": "HDAC",
+    "ic50_nm": 50.0,
+    "phase": "上市",
+    "indication": "外周T细胞淋巴瘤"
+  },
+  {
+    "name": "阿扎胞苷",
+    "smiles": "c1nc(n(c1)C2C(C(C(O2)CO)O)O)NC",
+    "target": "DNA甲基化",
+    "ic50_nm": 1000.0,
+    "phase": "上市",
+    "indication": "骨髓增生异常综合征"
+  },
+  {
+    "name": "维奈克拉",
+    "smiles": "Cc1c(c(c(n1c2ccc(cc2)F)C#N)C(=O)N3CCNCC3)C",
+    "target": "BCL-2",
+    "ic50_nm": 0.3,
+    "phase": "上市",
+    "indication": "慢性淋巴细胞白血病"
+  },
+  {
+    "name": "塞利尼索",
+    "smiles": "c1ccc2c(c1)nc(n2)N3CCNCC3",
+    "target": "XPO1",
+    "ic50_nm": 10.0,
+    "phase": "上市",
+    "indication": "多发性骨髓瘤"
+  },
+  {
+    "name": "芦可替尼",
+    "smiles": "Cc1c(c(c(n1c2ccc(cc2)F)C#N)C(=O)N3CCNCC3)C",
+    "target": "JAK1/2",
+    "ic50_nm": 3.2,
+    "phase": "上市",
+    "indication": "骨髓纤维化"
+  },
+  {
+    "name": "巴瑞替尼",
+    "smiles": "Cc1c(c(c(n1c2ccc(cc2)F)C#N)C(=O)N3CCNCC3)C",
+    "target": "JAK1/2",
+    "ic50_nm": 0.5,
+    "phase": "上市",
+    "indication": "类风湿关节炎"
+  },
+  {
+    "name": "来那度胺",
+    "smiles": "CC1=CC2=C(C=C1)N(C(=O)C2CC(=O)N)C1CCC(=O)NC1=O",
+    "target": "IKZF1/3",
+    "ic50_nm": 0.4,
+    "phase": "上市",
+    "indication": "多发性骨髓瘤"
+  }
 ]
