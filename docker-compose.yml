@@ -1,11 +1,12 @@
-version: "3.8"
+version: '3.8'
+
 services:
-  medi-pharma:
+  app:
     build: .
     ports:
-      - "8095:8095"
-    environment:
-      - MIMO_API_KEY=${MIMO_API_KEY}
+      - "8000:8000"
     volumes:
       - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
     restart: unless-stopped
