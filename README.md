@@ -1,6 +1,6 @@
-# 💊 MediPharma — AI驱动的药物发现平台
+# 💊 MediPharma
 
-> 基于ChEMBL 2.4M化合物数据和OpenTargets靶点信息，AI预测药物活性和ADMET性质
+**AI驱动的药物发现平台** — 基于ChEMBL 2.4M化合物数据和OpenTargets靶点信息，AI预测药物活性和ADMET性质。
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
