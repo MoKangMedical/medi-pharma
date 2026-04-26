@@ -1,0 +1,16 @@
+[
+  {
+    "id": "NCT001",
+    "drug": "奥希替尼",
+    "phase": "III",
+    "indication": "NSCLC",
+    "status": "completed"
+  },
+  {
+    "id": "NCT002",
+    "drug": "索托拉西布",
+    "phase": "II",
+    "indication": "NSCLC",
+    "status": "active"
+  }
+]
