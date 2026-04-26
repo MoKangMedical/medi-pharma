@@ -1,129 +1,154 @@
-# 💊 MediPharma
+# 💊 MediPharma — AI驱动的药物发现平台
 
-> AI药物发现平台 — 从靶点到先导化合物，用AI重新定义药物研发
+> 基于ChEMBL 2.4M化合物数据和OpenTargets靶点信息，AI预测药物活性和ADMET性质
 
-[![Python](https://img.shields.io/badge/python-3.9+-green.svg)]()
-[![ChEMBL](https://img.shields.io/badge/ChEMBL-2.4M%20compounds-blue.svg)]()
-
-## 一句话定义
-
-**MediPharma 不卖AI平台，卖候选化合物。** 输入靶点 → AI多模块协作 → 输出经验证的先导分子，含ADMET预测和优化建议。
-
-> 💡 核心理念：将药物发现从"10年10亿美元"压缩为"10周10万元"。不是替代药化家，而是成为每个药化家的AI搭档。
+[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://python.org)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![ChEMBL](https://img.shields.io/badge/ChEMBL-2.4M%20compounds-orange.svg)](https://www.ebi.ac.uk/chembl/)
+[![OpenTargets](https://img.shields.io/badge/OpenTargets-Target%20Analysis-purple.svg)](https://www.opentargets.org/)
 
 ---
 
-## 🎯 解决什么问题
+## 🎯 核心功能
 
-| 痛点 | 传统流程 | MediPharma |
-|------|---------|------------|
-| 靶点验证 | 6-12个月 | **1周** |
-| 先导化合物发现 | 2-3年 | **2-4周** |
-| ADMET筛选 | 昂贵、低通量 | **秒级高通量** |
-| 专家依赖 | 全球仅数千名药物化学家 | **AI民主化** |
+| 功能 | 描述 |
+|------|------|
+| 🧬 **化合物数据库** | ChEMBL 2.4M化合物检索，支持SMILES、InChIKey、名称搜索 |
+| 🎯 **靶点分析** | OpenTargets靶点-疾病关联分析，druggability评估 |
+| 🔬 **虚拟筛选** | AI模型（GNN/Transformer）筛选候选化合物，对接打分 |
+| 💉 **ADMET预测** | 吸收、分布、代谢、排泄、毒性全性质预测 |
+| ⚗️ **分子优化** | 基于AI的分子结构优化，先导化合物优化 |
+| 📊 **可视化** | 分子3D可视化、结合位点展示、活性热图 |
 
----
+## 🏗️ 技术栈
 
-## 🏗️ 系统架构
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                  MediPharma v2.1                            │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  🔬 靶点发现层                                                │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐                   │
-│  │ OpenTgt  │  │ TCGA/GEO │  │ KEGG/GO  │                   │
-│  │ 靶点验证  │  │ 多组学   │  │ 通路分析  │                   │
-│  └──────────┘  └──────────┘  └──────────┘                   │
-│                                                             │
-│  🧪 虚拟筛选层                                                │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐                   │
-│  │ ChEMBL   │  │  分子对接 │  │ ADMET    │                   │
-│  │ 2.4M化合物│  │ AutoDock │  │ 预测评估  │                   │
-│  └──────────┘  └──────────┘  └──────────┘                   │
-│                                                             │
-│  🧬 分子生成层                                                │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐                   │
-│  │ 药效团    │  │ 约束优化  │  │ 库扩展   │                   │
-│  │ 碎片组装  │  │ 多目标   │  │ 多样性   │                   │
-│  └──────────┘  └──────────┘  └──────────┘                   │
-│                                                             │
-│  📊 知识引擎层                                                │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐                   │
-│  │ ChEMBL   │  │ OpenFDA  │  │ PubMed   │                   │
-│  │ DrugBank │  │ ClinicalTrials                              │
-│  └──────────┘  └──────────┘  └──────────┘                   │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🔧 7大核心模块
-
-| 模块 | 功能 | 数据源 |
-|------|------|--------|
-| 靶点发现 | 基因关联→靶点验证→通路分析 | OpenTargets, TCGA, GEO |
-| 虚拟筛选 | 化合物库→对接→打分→排序 | ChEMBL 2.4M, AutoDock |
-| 分子生成 | 药效团碎片→约束组装→候选库 | 自研算法 |
-| ADMET预测 | 溶解度/毒性/代谢/渗透性 | 自研模型 |
-| 先导优化 | SAR分析→构效关系→优化建议 | RDKit |
-| 知识引擎 | 药物-靶点-疾病知识图谱 | ChEMBL, DrugBank, PubMed |
-| Agent编排 | 多Agent协作完成端到端药物发现 | CrewAI |
-
----
-
-## 🔬 Harness理论
-
-MediPharma 的核心竞争力是**药物发现Harness**设计：
-
-```
-药物发现Harness = 靶点验证流程 + 筛选策略编码 + ADMET约束 + 优化路径记忆 + 候选评估标准
-```
-
-- 同样的ChEMBL数据库，不同的Harness → 候选化合物质量差异10x
-- 我们的Harness编码了20年药物化学专家经验
-- 模型会过时，Harness持续进化
-
----
-
-## 💼 红杉叙事
-
-> **卖候选化合物，不卖AI平台。**
-
-- 输入：靶点基因ID
-- 输出：10-50个经ADMET验证的候选分子 + 结构化报告
-- 定价：按项目定价，非按API调用
-- 价值：10周出结果 vs 传统3年
-
----
+- **语言**: Python 3.9+
+- **化学信息学**: RDKit, ChEMBL_WEBRESOURCE_CLIENT
+- **深度学习**: PyTorch, PyTorch Geometric, DGL
+- **Web框架**: Streamlit, FastAPI
+- **数据源**: ChEMBL 34, OpenTargets Platform API
+- **部署**: Docker, Docker Compose
 
 ## 🚀 快速开始
 
+### 安装
+
 ```bash
+# 克隆仓库
 git clone https://github.com/MoKangMedical/medi-pharma.git
 cd medi-pharma
+
+# 创建虚拟环境
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# venv\Scripts\activate   # Windows
+
+# 安装依赖
 pip install -r requirements.txt
-python src/main.py --target BRAF --mode screening
 ```
 
+### 运行
+
+```bash
+# 启动 Streamlit 前端
+streamlit run main.py
+
+# 或启动 FastAPI 后端
+uvicorn backend.api:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Docker 部署
+
+```bash
+docker-compose up -d
+```
+
+## 📁 项目结构
+
+```
+medi-pharma/
+├── main.py                  # Streamlit 主入口
+├── backend/                 # FastAPI 后端
+├── data/
+│   ├── sample-compounds.json   # 50个热门药物分子数据
+│   └── targets.json            # 20个热门靶点数据
+├── src/
+│   ├── screening.py         # 虚拟筛选模块
+│   ├── admet.py             # ADMET预测模块
+│   └── compound_search.py   # 化合物检索模块
+├── admet_prediction/        # ADMET预测模型
+├── virtual_screening/       # 虚拟筛选引擎
+├── target_discovery/        # 靶点发现模块
+├── molecular_generation/    # 分子生成模块
+├── lead_optimization/       # 先导化合物优化
+├── drug_recommend/          # 药物推荐系统
+├── knowledge_engine/        # 知识图谱引擎
+├── agents/                  # AI Agent 模块
+├── orchestrator/            # 编排器
+├── integrations/            # 外部API集成
+├── examples/                # 使用案例
+├── tests/                   # 测试
+├── docs/                    # 文档
+└── scripts/                 # 工具脚本
+```
+
+## 📖 API 文档
+
+启动后端服务后访问：
+
+- **Swagger UI**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
+
+### 主要 API 端点
+
+```
+GET  /api/v1/compounds/search?q={query}     # 化合物搜索
+GET  /api/v1/compounds/{chembl_id}           # 化合物详情
+POST /api/v1/screening/virtual               # 虚拟筛选
+POST /api/v1/admet/predict                   # ADMET预测
+GET  /api/v1/targets/{target_id}             # 靶点信息
+GET  /api/v1/targets/{target_id}/diseases    # 靶点-疾病关联
+POST /api/v1/molecule/optimize               # 分子优化
+```
+
+### 示例请求
+
+```bash
+# 搜索化合物
+curl "http://localhost:8000/api/v1/compounds/search?q=aspirin"
+
+# ADMET预测
+curl -X POST "http://localhost:8000/api/v1/admet/predict" \
+  -H "Content-Type: application/json" \
+  -d '{"smiles": "CC(=O)OC1=CC=CC=C1C(=O)O"}'
+
+# 虚拟筛选
+curl -X POST "http://localhost:8000/api/v1/screening/virtual" \
+  -H "Content-Type: application/json" \
+  -d '{"target": "EGFR", "num_results": 10}'
+```
+
+## 📊 数据来源
+
+| 数据源 | 版本 | 规模 |
+|--------|------|------|
+| ChEMBL | 34 | 2.4M+ 化合物 |
+| OpenTargets | 2024.02 | 60K+ 靶点-疾病关联 |
+| PDB | - | 200K+ 蛋白质结构 |
+
+## 🤝 贡献
+
+欢迎贡献！请查看 [CONTRIBUTING.md](CONTRIBUTING.md) 了解详情。
+
+## 📄 许可证
+
+本项目采用 [MIT License](LICENSE) 开源许可证。
+
+## 📮 联系方式
+
+- **Issues**: [GitHub Issues](https://github.com/MoKangMedical/medi-pharma/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/MoKangMedical/medi-pharma/discussions)
+
 ---
 
-## 📊 模块覆盖
-
-| 模块 | 文件数 | 状态 |
-|------|--------|------|
-| 靶点发现 | 4 | ✅ 已完成 |
-| 虚拟筛选 | 3 | ✅ 已完成 |
-| 分子生成 | 2 | ✅ 已完成 |
-| ADMET | 3 | ✅ 已完成 |
-| 先导优化 | 2 | ✅ 已完成 |
-| 知识引擎 | 3 | ✅ 已完成 |
-| Agent编排 | 2 | ✅ 已完成 |
-
----
-
-## 📄 License
-
-MIT License
+⭐ 如果这个项目对你有帮助，请给个 Star！
