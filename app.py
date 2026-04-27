@@ -317,11 +317,12 @@ def main():
     st.divider()
     
     # 功能标签页
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
         "🎯 虚拟筛选", 
         "🧬 分子生成", 
         "💊 ADMET预测",
         "🔬 分子可视化",
+        "💊 药物重定位",
         "📊 数据浏览",
         "🔄 全流程演示"
     ])
@@ -494,8 +495,73 @@ def main():
                 st.subheader("分子属性")
                 render_mol_properties(display_smiles)
     
-    # ===== Tab 5: 数据浏览 =====
+    # ===== Tab 5: 药物重定位 =====
     with tab5:
+        st.header("药物重定位")
+        st.markdown("基于分子相似性发现老药新用机会")
+        
+        # 输入SMILES
+        repurposing_smiles = st.text_input(
+            "输入查询分子SMILES",
+            "CC(=O)OC1=CC=CC=C1C(=O)O",
+            key="repurposing_smiles"
+        )
+        
+        if st.button("🔍 查找相似药物", key="btn_repurposing", use_container_width=True):
+            if repurposing_smiles:
+                with st.spinner("正在搜索相似药物..."):
+                    try:
+                        sys.path.insert(0, str(Path(__file__).parent / "src"))
+                        from drug_repurposing import DrugRepurposing
+                        
+                        repurposer = DrugRepurposing()
+                        
+                        # 查找相似药物
+                        similar_drugs = repurposer.find_similar_drugs(repurposing_smiles, top_n=5)
+                        
+                        if similar_drugs:
+                            st.success(f"找到 {len(similar_drugs)} 个相似药物")
+                            
+                            # 显示结果
+                            import pandas as pd
+                            df = pd.DataFrame(similar_drugs)
+                            st.dataframe(df[["name", "indication", "similarity"]], use_container_width=True)
+                            
+                            # 显示查询分子结构
+                            st.subheader("查询分子")
+                            render_mol_2d(repurposing_smiles)
+                            
+                            # 分析类药性
+                            st.subheader("类药性分析")
+                            drug_likeness = repurposer.analyze_drug_likeness(repurposing_smiles)
+                            
+                            if "error" not in drug_likeness:
+                                col1, col2, col3, col4 = st.columns(4)
+                                with col1:
+                                    st.metric("分子量", drug_likeness["molecular_weight"])
+                                with col2:
+                                    st.metric("LogP", drug_likeness["logp"])
+                                with col3:
+                                    st.metric("QED", drug_likeness["qed"])
+                                with col4:
+                                    st.metric("类药性", "✅" if drug_likeness["is_drug_like"] else "❌")
+                            
+                            # 建议新适应症
+                            st.subheader("潜在新适应症")
+                            new_indications = repurposer.suggest_new_indications(repurposing_smiles)
+                            
+                            if new_indications:
+                                for indication in new_indications:
+                                    st.info(f"**{indication['indication']}** (来源: {indication['source_drug']}, 相似性: {indication['similarity']})")
+                            else:
+                                st.warning("未找到潜在新适应症")
+                        else:
+                            st.warning("未找到相似药物")
+                    except Exception as e:
+                        st.error(f"药物重定位失败: {e}")
+    
+    # ===== Tab 6: 数据浏览 =====
+    with tab6:
         st.header("数据浏览")
         st.markdown("浏览本地化合物库和靶点库")
         
@@ -515,8 +581,8 @@ def main():
                 st.dataframe(df, use_container_width=True)
                 st.caption(f"共 {len(targets)} 个靶点")
     
-    # ===== Tab 6: 全流程演示 =====
-    with tab6:
+    # ===== Tab 7: 全流程演示 =====
+    with tab7:
         st.header("全流程演示")
         st.markdown("展示完整的药物发现流程")
         
