@@ -317,7 +317,7 @@ def main():
     st.divider()
     
     # 功能标签页
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11 = st.tabs([
         "🎯 虚拟筛选", 
         "🧬 分子生成", 
         "💊 ADMET预测",
@@ -326,6 +326,7 @@ def main():
         "🕸️ 知识图谱",
         "🏥 临床试验",
         "📋 监管合规",
+        "🧬 蛋白质结构",
         "📊 数据浏览",
         "🔄 全流程演示"
     ])
@@ -849,8 +850,127 @@ def main():
                 except Exception as e:
                     st.error(f"监管合规检查失败: {e}")
     
-    # ===== Tab 9: 数据浏览 =====
+    # ===== Tab 9: 蛋白质结构 =====
     with tab9:
+        st.header("蛋白质结构预测")
+        st.markdown("基于AlphaFold2/ESMFold的蛋白质结构预测和分析")
+        
+        # 输入参数
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            protein_target = st.selectbox(
+                "选择靶点",
+                ["EGFR", "HER2", "BRAF", "KRAS", "PI3K", "自定义"],
+                key="protein_target"
+            )
+            
+            if protein_target == "自定义":
+                protein_sequence = st.text_area(
+                    "输入蛋白质序列",
+                    "MKTILILTLAVVTASCFCQGTGHGNSRGKTCTSCGSN",
+                    height=100,
+                    key="protein_sequence"
+                )
+            else:
+                protein_sequence = ""
+        
+        with col2:
+            protein_method = st.selectbox(
+                "预测方法",
+                ["AlphaFold2", "ESMFold"],
+                key="protein_method"
+            )
+            
+            protein_ligand = st.text_input(
+                "配体SMILES (可选)",
+                "CC(=O)OC1=CC=CC=C1C(=O)O",
+                key="protein_ligand"
+            )
+        
+        if st.button("🧬 预测结构", key="btn_protein", use_container_width=True):
+            with st.spinner("正在预测蛋白质结构..."):
+                try:
+                    sys.path.insert(0, str(Path(__file__).parent / "src"))
+                    from protein_structure import ProteinStructurePredictor
+                    
+                    predictor = ProteinStructurePredictor()
+                    
+                    # 获取序列
+                    if protein_target == "自定义":
+                        sequence = protein_sequence
+                    else:
+                        sequence = predictor.get_target_sequence(protein_target)
+                        if not sequence:
+                            st.error(f"未找到{protein_target}的序列")
+                            return
+                    
+                    # 预测结构
+                    structure = predictor.predict_structure(sequence, protein_method.lower())
+                    
+                    # 显示结果
+                    st.success("蛋白质结构预测完成!")
+                    
+                    # 显示基本信息
+                    st.subheader("结构信息")
+                    
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("PDB ID", structure.pdb_id)
+                    with col2:
+                        st.metric("置信度", f"{structure.confidence*100:.1f}%")
+                    with col3:
+                        st.metric("方法", structure.method)
+                    
+                    # 显示序列
+                    st.subheader("蛋白质序列")
+                    st.text_area("序列", structure.sequence, height=100, key="seq_display")
+                    
+                    # 分析结合位点
+                    if protein_ligand:
+                        st.subheader("结合位点分析")
+                        
+                        binding_analysis = predictor.analyze_binding_site(structure, protein_ligand)
+                        
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            st.markdown("**结合位点信息**")
+                            st.info(f"中心: {binding_analysis['binding_site']['center']}")
+                            st.info(f"半径: {binding_analysis['binding_site']['radius']} Å")
+                            st.info(f"残基: {', '.join(binding_analysis['binding_site']['residues'])}")
+                        
+                        with col2:
+                            st.markdown("**预测结合亲和力**")
+                            st.metric("结合亲和力", f"{binding_analysis['predicted_affinity']} kcal/mol")
+                            st.metric("置信度", f"{binding_analysis['confidence']*100:.1f}%")
+                        
+                        # 显示相互作用
+                        st.subheader("相互作用")
+                        
+                        for interaction in binding_analysis["interactions"]:
+                            st.markdown(f"- **{interaction['type']}**: {interaction['residue']} (距离: {interaction['distance']} Å)")
+                    
+                    # 生成PyMOL脚本
+                    st.subheader("PyMOL脚本")
+                    
+                    pymol_script = predictor.generate_pymol_script(structure)
+                    
+                    st.code(pymol_script, language="python")
+                    
+                    # 下载脚本
+                    st.download_button(
+                        "📥 下载PyMOL脚本",
+                        pymol_script,
+                        f"{structure.pdb_id}_pymol.py",
+                        "text/python"
+                    )
+                    
+                except Exception as e:
+                    st.error(f"蛋白质结构预测失败: {e}")
+    
+    # ===== Tab 10: 数据浏览 =====
+    with tab10:
         st.header("数据浏览")
         st.markdown("浏览本地化合物库和靶点库")
         
@@ -870,8 +990,8 @@ def main():
                 st.dataframe(df, use_container_width=True)
                 st.caption(f"共 {len(targets)} 个靶点")
     
-    # ===== Tab 10: 全流程演示 =====
-    with tab10:
+    # ===== Tab 11: 全流程演示 =====
+    with tab11:
         st.header("全流程演示")
         st.markdown("展示完整的药物发现流程")
         
