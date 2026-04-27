@@ -317,12 +317,13 @@ def main():
     st.divider()
     
     # 功能标签页
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
         "🎯 虚拟筛选", 
         "🧬 分子生成", 
         "💊 ADMET预测",
         "🔬 分子可视化",
         "💊 药物重定位",
+        "🕸️ 知识图谱",
         "📊 数据浏览",
         "🔄 全流程演示"
     ])
@@ -560,8 +561,108 @@ def main():
                     except Exception as e:
                         st.error(f"药物重定位失败: {e}")
     
-    # ===== Tab 6: 数据浏览 =====
+    # ===== Tab 6: 知识图谱 =====
     with tab6:
+        st.header("知识图谱")
+        st.markdown("可视化靶点、疾病、药物之间的关联关系")
+        
+        # 选择图谱类型
+        graph_type = st.selectbox(
+            "选择图谱类型",
+            ["靶点-疾病关联", "药物-靶点关联", "通路-基因关联", "示例图谱"],
+            key="graph_type"
+        )
+        
+        if graph_type == "靶点-疾病关联":
+            st.subheader("靶点-疾病知识图谱")
+            
+            # 选择靶点
+            if targets:
+                target_names = [t["gene_symbol"] for t in targets]
+                selected_target = st.selectbox("选择靶点", target_names, key="kg_target")
+                
+                # 获取相关疾病
+                target_data = next((t for t in targets if t["gene_symbol"] == selected_target), None)
+                if target_data and "disease_areas" in target_data:
+                    diseases = target_data["disease_areas"]
+                    
+                    # 生成图谱
+                    try:
+                        sys.path.insert(0, str(Path(__file__).parent / "src"))
+                        from knowledge_graph_viz import create_target_disease_graph
+                        
+                        graph_html = create_target_disease_graph(selected_target, diseases)
+                        st.components.v1.html(graph_html, height=600)
+                    except Exception as e:
+                        st.error(f"生成图谱失败: {e}")
+        
+        elif graph_type == "药物-靶点关联":
+            st.subheader("药物-靶点知识图谱")
+            
+            # 输入药物SMILES
+            drug_smiles = st.text_input("输入药物SMILES", "CC(=O)OC1=CC=CC=C1C(=O)O", key="kg_drug")
+            
+            if drug_smiles:
+                # 显示药物结构
+                render_mol_2d(drug_smiles, width=200, height=150)
+                
+                # 生成图谱（示例）
+                try:
+                    sys.path.insert(0, str(Path(__file__).parent / "src"))
+                    from knowledge_graph_viz import create_drug_target_graph
+                    
+                    # 示例靶点
+                    sample_targets = ["COX-1", "COX-2", "TXA2"]
+                    graph_html = create_drug_target_graph("Aspirin", sample_targets)
+                    st.components.v1.html(graph_html, height=600)
+                except Exception as e:
+                    st.error(f"生成图谱失败: {e}")
+        
+        elif graph_type == "通路-基因关联":
+            st.subheader("通路-基因知识图谱")
+            
+            # 选择通路
+            pathway = st.selectbox(
+                "选择通路",
+                ["MAPK通路", "PI3K-AKT通路", "Wnt通路", "Notch通路"],
+                key="kg_pathway"
+            )
+            
+            # 示例基因
+            pathway_genes = {
+                "MAPK通路": ["KRAS", "BRAF", "MEK", "ERK"],
+                "PI3K-AKT通路": ["PI3K", "AKT", "mTOR", "PTEN"],
+                "Wnt通路": ["Wnt", "Frizzled", "β-catenin", "APC"],
+                "Notch通路": ["Notch", "DLL", "Jagged", "NICD"],
+            }
+            
+            genes = pathway_genes.get(pathway, [])
+            
+            if genes:
+                try:
+                    sys.path.insert(0, str(Path(__file__).parent / "src"))
+                    from knowledge_graph_viz import create_pathway_graph
+                    
+                    graph_html = create_pathway_graph(pathway, genes)
+                    st.components.v1.html(graph_html, height=600)
+                except Exception as e:
+                    st.error(f"生成图谱失败: {e}")
+        
+        else:  # 示例图谱
+            st.subheader("示例知识图谱")
+            st.markdown("展示EGFR靶点相关的知识图谱")
+            
+            try:
+                sys.path.insert(0, str(Path(__file__).parent / "src"))
+                from knowledge_graph_viz import get_sample_knowledge_graph
+                
+                graph_html = get_sample_knowledge_graph()
+                st.components.v1.html(graph_html, height=600)
+            except Exception as e:
+                st.error(f"生成图谱失败: {e}")
+    
+    # ===== Tab 7: 数据浏览 =====
+    with tab7:
         st.header("数据浏览")
         st.markdown("浏览本地化合物库和靶点库")
         
@@ -581,8 +682,8 @@ def main():
                 st.dataframe(df, use_container_width=True)
                 st.caption(f"共 {len(targets)} 个靶点")
     
-    # ===== Tab 7: 全流程演示 =====
-    with tab7:
+    # ===== Tab 8: 全流程演示 =====
+    with tab8:
         st.header("全流程演示")
         st.markdown("展示完整的药物发现流程")
         
