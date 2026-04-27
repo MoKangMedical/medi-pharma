@@ -56,19 +56,17 @@ class MolecularGenerationEngine:
         """
         logger.info(f"=== 开始分子生成: {target_name or 'de novo'} ===")
 
-        # 默认目标属性
+        # 默认目标属性 - 放宽范围
         props = target_properties or {
-            "mw": 400,
-            "logp": 2.5,
-            "hbd": 2,
-            "hba": 5,
+            "mw": 350,    # 分子量350左右
+            "logp": 2.5,  # LogP 2.5左右
         }
 
-        # Step 1: 生成初始分子库
+        # Step 1: 生成初始分子库（不过滤属性，生成更多）
         logger.info("Step 1: 生成初始分子库...")
         generated = self.generator.generate(
             n_molecules=n_generate,
-            target_properties=props,
+            target_properties=None,  # 先不过滤
             scaffold=scaffold
         )
 
