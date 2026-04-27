@@ -317,7 +317,7 @@ def main():
     st.divider()
     
     # 功能标签页
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12, tab13 = st.tabs([
         "🎯 虚拟筛选", 
         "🧬 分子生成", 
         "💊 ADMET预测",
@@ -328,6 +328,7 @@ def main():
         "📋 监管合规",
         "🧬 蛋白质结构",
         "💊 药物组合",
+        "🎯 多靶点设计",
         "📊 数据浏览",
         "🔄 全流程演示"
     ])
@@ -1074,8 +1075,118 @@ def main():
                 except Exception as e:
                     st.error(f"药物组合预测失败: {e}")
     
-    # ===== Tab 11: 数据浏览 =====
+    # ===== Tab 11: 多靶点设计 =====
     with tab11:
+        st.header("多靶点药物设计")
+        st.markdown("基于AI设计同时作用于多个靶点的药物")
+        
+        # 输入参数
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            mt_target1 = st.selectbox(
+                "靶点1",
+                ["EGFR", "HER2", "BRAF", "MEK", "PI3K", "mTOR", "JAK1", "JAK2", "VEGFR", "PDGFR"],
+                key="mt_target1"
+            )
+            mt_target2 = st.selectbox(
+                "靶点2",
+                ["EGFR", "HER2", "BRAF", "MEK", "PI3K", "mTOR", "JAK1", "JAK2", "VEGFR", "PDGFR"],
+                key="mt_target2"
+            )
+        
+        with col2:
+            mt_indication = st.text_input("适应症", "癌症", key="mt_indication")
+            mt_action = st.selectbox("操作", ["设计多靶点药物", "查找靶点对", "分析选择性"], key="mt_action")
+        
+        if st.button("🎯 设计多靶点药物", key="btn_multi_target", use_container_width=True):
+            with st.spinner("正在设计多靶点药物..."):
+                try:
+                    sys.path.insert(0, str(Path(__file__).parent / "src"))
+                    from multi_target import MultiTargetDesigner
+                    
+                    designer = MultiTargetDesigner()
+                    
+                    if mt_action == "设计多靶点药物":
+                        # 设计多靶点药物
+                        design = designer.design_multi_target_drug(mt_target1, mt_target2, mt_indication)
+                        
+                        # 显示结果
+                        st.success("多靶点药物设计完成!")
+                        
+                        # 显示基本信息
+                        st.subheader("设计结果")
+                        
+                        col1, col2, col3, col4 = st.columns(4)
+                        with col1:
+                            st.metric("靶点1", design.target1)
+                        with col2:
+                            st.metric("靶点2", design.target2)
+                        with col3:
+                            st.metric("选择性", f"{design.selectivity_score*100:.1f}%")
+                        with col4:
+                            st.metric("类药性", f"{design.drug_likeness*100:.1f}%")
+                        
+                        # 显示设计的分子
+                        st.subheader("设计的分子")
+                        st.code(design.designed_smiles)
+                        
+                        # 显示预测活性
+                        st.subheader("预测活性")
+                        
+                        for target, activity in design.predicted_activities.items():
+                            st.metric(f"{target}活性", f"{activity*100:.1f}%")
+                    
+                    elif mt_action == "查找靶点对":
+                        # 查找靶点对
+                        pairs = designer.find_target_pairs(mt_indication)
+                        
+                        # 显示结果
+                        st.success(f"找到 {len(pairs)} 个靶点对!")
+                        
+                        # 显示结果表格
+                        import pandas as pd
+                        df = pd.DataFrame(pairs)
+                        st.dataframe(df, use_container_width=True)
+                    
+                    else:  # 分析选择性
+                        # 分析选择性
+                        analysis = designer.analyze_selectivity(
+                            "CC(=O)OC1=CC=CC=C1C(=O)O",
+                            mt_target1,
+                            mt_target2
+                        )
+                        
+                        # 显示结果
+                        st.success("选择性分析完成!")
+                        
+                        # 显示基本信息
+                        st.subheader("选择性分析")
+                        
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.metric("靶点1活性", f"{analysis['activity1']*100:.1f}%")
+                        with col2:
+                            st.metric("靶点2活性", f"{analysis['activity2']*100:.1f}%")
+                        with col3:
+                            st.metric("选择性", f"{analysis['selectivity']*100:.1f}%")
+                        
+                        # 显示是否选择性
+                        if analysis["is_selective"]:
+                            st.success("✅ 选择性良好")
+                        else:
+                            st.warning("⚠️ 选择性需要优化")
+                        
+                        # 显示建议
+                        st.subheader("优化建议")
+                        for rec in analysis["recommendations"]:
+                            st.info(rec)
+                    
+                except Exception as e:
+                    st.error(f"多靶点药物设计失败: {e}")
+    
+    # ===== Tab 12: 数据浏览 =====
+    with tab12:
         st.header("数据浏览")
         st.markdown("浏览本地化合物库和靶点库")
         
@@ -1095,8 +1206,8 @@ def main():
                 st.dataframe(df, use_container_width=True)
                 st.caption(f"共 {len(targets)} 个靶点")
     
-    # ===== Tab 12: 全流程演示 =====
-    with tab12:
+    # ===== Tab 13: 全流程演示 =====
+    with tab13:
         st.header("全流程演示")
         st.markdown("展示完整的药物发现流程")
         
