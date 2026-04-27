@@ -1,7 +1,16 @@
-FROM python:3.12-slim
+FROM python:3.10-slim
+
 WORKDIR /app
+
+# 安装依赖
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+# 复制代码
 COPY . .
-EXPOSE 8095
-CMD ["python3", "main.py", "serve", "--port", "8095"]
+
+# 暴露端口
+EXPOSE 8000
+
+# 启动命令
+CMD ["python", "src/main.py"]

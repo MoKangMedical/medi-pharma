@@ -11,6 +11,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from fastapi import Depends
+
 from .models import (
     TargetDiscoveryRequest, TargetDiscoveryResponse,
     ScreeningRequest, ScreeningResponse,
@@ -23,6 +25,26 @@ from .models import (
 )
 
 logger = logging.getLogger(__name__)
+
+# ===== 依赖注入工厂 — 模块级延迟加载，避免路由内inline import =====
+_engine_cache: dict = {}
+
+def _get_engine(module_path: str, class_name: str):
+    """通用引擎工厂：延迟导入 + 单例缓存"""
+    key = f"{module_path}.{class_name}"
+    if key not in _engine_cache:
+        import importlib
+        mod = importlib.import_module(module_path)
+        _engine_cache[key] = getattr(mod, class_name)()
+    return _engine_cache[key]
+
+def get_target_engine():     return _get_engine("target_discovery.engine", "TargetDiscoveryEngine")
+def get_screening_engine():  return _get_engine("virtual_screening.engine", "VirtualScreeningEngine")
+def get_generation_engine(): return _get_engine("molecular_generation.engine", "MolecularGenerationEngine")
+def get_admet_engine():      return _get_engine("admet_prediction.engine", "ADMETEngine")
+def get_optimization_engine(): return _get_engine("lead_optimization.engine", "LeadOptimizationEngine")
+def get_pipeline_orchestrator(): return _get_engine("orchestrator.pipeline", "PipelineOrchestrator")
+def get_knowledge_engine():  return _get_engine("knowledge_engine.engine", "KnowledgeEngine")
 
 # 创建FastAPI app
 app = FastAPI(
@@ -64,23 +86,17 @@ async def health_check():
 
 # ===== 靶点发现 =====
 @app.post("/api/v1/targets/discover", response_model=TargetDiscoveryResponse)
-async def discover_targets(req: TargetDiscoveryRequest):
+async def discover_targets(req: TargetDiscoveryRequest, engine=Depends(get_target_engine)):
     """靶点发现：疾病 → 候选靶点排名"""
     try:
-        from target_discovery.engine import TargetDiscoveryEngine
-        engine = TargetDiscoveryEngine()
         report = engine.discover_targets(
-            disease=req.disease,
-            max_papers=req.max_papers,
-            top_n=req.top_n,
-            disease_burden=req.disease_burden,
+            disease=req.disease, max_papers=req.max_papers,
+            top_n=req.top_n, disease_burden=req.disease_burden,
             unmet_need=req.unmet_need
         )
         return TargetDiscoveryResponse(
-            disease=report.disease,
-            total_candidates=report.total_candidates,
-            top_targets=report.top_targets,
-            summary=report.summary
+            disease=report.disease, total_candidates=report.total_candidates,
+            top_targets=report.top_targets, summary=report.summary
         )
     except Exception as e:
         logger.error(f"靶点发现失败: {e}")

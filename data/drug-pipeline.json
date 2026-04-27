@@ -1,0 +1,14 @@
+[
+  {
+    "drug": "化合物A",
+    "target": "EGFR",
+    "phase": "I",
+    "company": "MoKang"
+  },
+  {
+    "drug": "化合物B",
+    "target": "KRAS",
+    "phase": "临床前",
+    "company": "MoKang"
+  }
+]
