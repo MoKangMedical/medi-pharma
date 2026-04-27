@@ -1,6 +1,6 @@
 """
 分子生成策略模块
-支持多种分子生成方法：基于RDKit的BRICS片段组装、骨架替换、片段生长
+基于预定义药物骨架和RDKit合法操作生成有效分子
 """
 
 import logging
@@ -29,35 +29,60 @@ class GeneratedMolecule:
 class SMILESGenerator:
     """
     SMILES分子生成器
-    基于RDKit的BRICS片段组装 + 骨架替换
+    基于预定义药物骨架和取代基组合
     """
 
-    # 常见药物骨架（已验证有效的SMILES）
-    SCAFFOLDS = [
-        "c1ccc2ccccc2c1",           # 萘
-        "c1ccc2[nH]ccc2c1",         # 吲哚
-        "c1ccc2ncccc2c1",           # 喹啉
-        "c1cnc2ccccc2n1",           # 喹唑啉
-        "c1ccncc1",                 # 吡啶
-        "C1CCNCC1",                 # 哌啶
-        "C1CCOCC1",                 # 吗啉
-        "c1ccc(cc1)",               # 苯基
-        "c1cnccn1",                 # 嘧啶
-        "c1cncnc1",                 # 吡嗪
+    # 已验证有效的药物分子骨架（共价键正确）
+    DRUG_SCAFFOLDS = [
+        # 简单芳香骨架
+        "c1ccccc1",                    # 苯
+        "c1ccncc1",                    # 吡啶
+        "c1ccoc1",                     # 呋喃
+        "c1ccsc1",                     # 噻吩
+        "c1cnccn1",                    # 嘧啶
+        "c1cncnc1",                    # 吡嗪
+        # 稠环骨架
+        "c1ccc2ccccc2c1",              # 萘
+        "c1ccc2[nH]ccc2c1",            # 吲哚
+        "c1ccc2ncccc2c1",              # 喹啉
+        "c1cnc2ccccc2n1",              # 喹唑啉
+        "c1ccc2occc2c1",               # 苯并呋喃
+        "c1ccc2sccc2c1",               # 苯并噻吩
+        # 饱和杂环
+        "C1CCNCC1",                    # 哌啶
+        "C1CCOCC1",                    # 吗啉
+        "C1CCNCC1",                    # 哌嗪
+        "C1CCOC1",                     # 四氢呋喃
+        "C1CNC1",                      # 氮杂环丁烷
+        "C1CC1",                       # 环丙烷
+        "C1CCC1",                      # 环丁烷
+        "C1CCCCC1",                    # 环己烷
+        "C1CCNC1",                     # 吡咯烷
     ]
 
-    # 常见取代基（单原子或小基团）
+    # 常见药物取代基（已验证有效）
     SUBSTITUENTS = [
         "N", "O", "F", "Cl", "Br",
-        "C", "CC", "CCC",
-        "OCC", "NCC",
-        "C(=O)N", "C(=O)O",
+        "C", "CC", "CCC", "CCCC",
+        "OCC", "OCCC",
+        "NCC", "NCCC",
+        "C(=O)N", "C(=O)O", "C(=O)OC",
+        "NC(=O)", "OC(=O)",
         "C(F)(F)F",
-        "OCCOC",
+        "S(=O)(=O)N",
+        "S(=O)(=O)C",
+        "N1CCOCC1",                    # 吗啉基
+        "N1CCNCC1",                    # 哌嗪基
+        "C1CCNCC1",                    # 哌啶基
     ]
 
-    # 连接点标记
-    ATTACHMENT_POINT = "[*]"
+    # 有效连接器
+    LINKERS = [
+        "", "C", "CC", "CCC",
+        "C(=O)", "C(=O)N", "NC(=O)",
+        "OCC", "NCC",
+        "S(=O)(=O)",
+    ]
 
     def __init__(self, seed: int = 42):
         random.seed(seed)
@@ -70,7 +95,7 @@ class SMILESGenerator:
         scaffold: Optional[str] = None
     ) -> list[GeneratedMolecule]:
         """
-        基于RDKit生成有效分子
+        生成有效分子
 
         Args:
             n_molecules: 生成数量
@@ -79,32 +104,24 @@ class SMILESGenerator:
         """
         try:
             from rdkit import Chem
-            from rdkit.Chem import AllChem, Descriptors, QED, BRICS
-            from rdkit.Chem import rdMolDescriptors
+            from rdkit.Chem import Descriptors, QED
         except ImportError:
             logger.warning("RDKit未安装，使用简化生成")
             return self._generate_simple(n_molecules)
 
         molecules = []
         seen_smiles = set()
-        max_attempts = n_molecules * 20
+        max_attempts = n_molecules * 50
         attempts = 0
 
         while len(molecules) < n_molecules and attempts < max_attempts:
             attempts += 1
 
             try:
-                # 选择生成策略
-                strategy = random.choice(["brics", "scaffold_hop", "fragment_grow"])
+                # 生成SMILES
+                smiles = self._generate_one(scaffold)
 
-                if strategy == "brics":
-                    smiles = self._generate_brics()
-                elif strategy == "scaffold_hop":
-                    smiles = self._scaffold_hop(scaffold)
-                else:
-                    smiles = self._fragment_grow(scaffold)
-
-                if not smiles:
+                if not smiles or smiles in seen_smiles:
                     continue
 
                 # 验证SMILES
@@ -132,14 +149,16 @@ class SMILESGenerator:
                     "rings": Descriptors.RingCount(mol),
                 }
 
-                # 过滤目标属性
-                if target_properties and not self._match_properties(props, target_properties):
+                # 类药性过滤
+                if props["mw"] > 600 or props["mw"] < 100:
+                    continue
+                if props["logp"] > 6 or props["logp"] < -3:
+                    continue
+                if props["qed"] < 0.3:  # QED太低
                     continue
 
-                # 类药性过滤
-                if props["mw"] > 600 or props["mw"] < 150:
-                    continue
-                if props["logp"] > 6 or props["logp"] < -2:
+                # 过滤目标属性
+                if target_properties and not self._match_properties(props, target_properties):
                     continue
 
                 mol_obj = GeneratedMolecule(
@@ -154,119 +173,51 @@ class SMILESGenerator:
                 )
                 molecules.append(mol_obj)
 
-            except Exception as e:
+            except Exception:
                 continue
 
         logger.info(f"生成 {len(molecules)} 个有效分子 (尝试 {attempts} 次)")
         return molecules
 
-    def _generate_brics(self) -> Optional[str]:
-        """基于BRICS片段组装生成分子"""
+    def _generate_one(self, scaffold: Optional[str] = None) -> Optional[str]:
+        """生成单个SMILES"""
         try:
             from rdkit import Chem
-            from rdkit.Chem import BRICS, AllChem
-
-            # 选择2-3个骨架
-            n_frags = random.randint(2, 3)
-            scaffold_smiles = random.sample(self.SCAFFOLDS, n_frags)
-
-            # 转换为RDKit分子并添加BRICS虚拟原子
-            frags = []
-            for smi in scaffold_smiles:
-                mol = Chem.MolFromSmiles(smi)
-                if mol:
-                    frags.append(mol)
-
-            if len(frags) < 2:
-                return None
-
-            # 使用BRICS构建分子
-            combined = BRICS.BRICSBuild(frags)
-
-            if combined:
-                # 取第一个结果
-                for prod in combined:
-                    if prod:
-                        result_smiles = Chem.MolToSmiles(prod)
-                        # 清理BRICS标记
-                        result_smiles = result_smiles.replace("[*]", "")
-                        if len(result_smiles) > 5:
-                            return result_smiles
-
-            return None
-        except Exception:
-            return None
-
-    def _scaffold_hop(self, base_scaffold: Optional[str] = None) -> Optional[str]:
-        """骨架跃迁：替换核心骨架"""
-        try:
-            from rdkit import Chem
-            from rdkit.Chem import AllChem
 
             # 选择骨架
-            if base_scaffold:
-                scaffold_smi = base_scaffold
+            if scaffold:
+                base_smi = scaffold
             else:
-                scaffold_smi = random.choice(self.SCAFFOLDS)
+                base_smi = random.choice(self.DRUG_SCAFFOLDS)
 
-            scaffold_mol = Chem.MolFromSmiles(scaffold_smi)
-            if scaffold_mol is None:
+            base_mol = Chem.MolFromSmiles(base_smi)
+            if base_mol is None:
                 return None
 
-            # 添加1-2个取代基
-            n_subst = random.randint(1, 2)
-            result_mol = scaffold_mol
+            # 添加1-3个取代基
+            n_subst = random.randint(1, 3)
+            result_smi = base_smi
 
             for _ in range(n_subst):
-                subst_smi = random.choice(self.SUBSTITUENTS)
-                subst_mol = Chem.MolFromSmiles(subst_smi)
-                if subst_mol is None:
-                    continue
-
-                # 简单组合
-                combined_smiles = Chem.MolToSmiles(result_mol) + subst_smi
-                combined_mol = Chem.MolFromSmiles(combined_smiles)
-                if combined_mol:
-                    result_mol = combined_mol
-
-            return Chem.MolToSmiles(result_mol)
-        except Exception:
-            return None
-
-    def _fragment_grow(self, base_scaffold: Optional[str] = None) -> Optional[str]:
-        """片段生长：从骨架开始逐步添加片段"""
-        try:
-            from rdkit import Chem
-            from rdkit.Chem import AllChem
-
-            # 选择起始骨架
-            if base_scaffold:
-                current_smi = base_scaffold
-            else:
-                current_smi = random.choice(self.SCAFFOLDS)
-
-            current_mol = Chem.MolFromSmiles(current_smi)
-            if current_mol is None:
-                return None
-
-            # 生长1-3次
-            n_grow = random.randint(1, 3)
-            for _ in range(n_grow):
-                # 选择连接器和片段
-                linker = random.choice(["C", "CC", "C(=O)N", "NC(=O)", "OCC"])
-                fragment = random.choice(self.SUBSTITUENTS)
+                # 选择连接器和取代基
+                linker = random.choice(self.LINKERS)
+                subst = random.choice(self.SUBSTITUENTS)
 
                 # 组合
-                new_smiles = Chem.MolToSmiles(current_mol) + linker + fragment
-                new_mol = Chem.MolFromSmiles(new_smiles)
+                new_smi = result_smi + linker + subst
+                new_mol = Chem.MolFromSmiles(new_smi)
 
                 if new_mol:
-                    current_mol = new_mol
-                    # 检查分子大小
-                    if current_mol.GetNumHeavyAtoms() > 40:
-                        break
+                    result_smi = Chem.MolToSmiles(new_mol)
+                else:
+                    # 尝试不加连接器
+                    new_smi = result_smi + subst
+                    new_mol = Chem.MolFromSmiles(new_smi)
+                    if new_mol:
+                        result_smi = Chem.MolToSmiles(new_mol)
 
-            return Chem.MolToSmiles(current_mol)
+            return result_smi
+
         except Exception:
             return None
 
@@ -308,7 +259,6 @@ class SMILESGenerator:
             return True, props
 
         except ImportError:
-            # RDKit未安装，基础验证
             valid = len(smiles) > 5 and any(c.isalpha() for c in smiles)
             return valid, {"mw": 300, "logp": 2.0, "qed": 0.5, "sa_score": 3.0}
         except Exception:
@@ -319,7 +269,6 @@ class SMILESGenerator:
         for key, target_val in targets.items():
             if key in props:
                 val = props[key]
-                # 允许30%偏差
                 if abs(val - target_val) > abs(target_val * 0.3):
                     return False
         return True
