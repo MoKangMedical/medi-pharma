@@ -317,7 +317,7 @@ def main():
     st.divider()
     
     # 功能标签页
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12, tab13, tab14 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12, tab13, tab14, tab15 = st.tabs([
         "🎯 虚拟筛选", 
         "🧬 分子生成", 
         "💊 ADMET预测",
@@ -330,6 +330,7 @@ def main():
         "💊 药物组合",
         "🎯 多靶点设计",
         "⚗️ 药物优化",
+        "🔍 药物筛选",
         "📊 数据浏览",
         "🔄 全流程演示"
     ])
@@ -1309,8 +1310,142 @@ def main():
                 except Exception as e:
                     st.error(f"药物优化失败: {e}")
     
-    # ===== Tab 13: 数据浏览 =====
+    # ===== Tab 13: 药物筛选 =====
     with tab13:
+        st.header("药物筛选")
+        st.markdown("基于AI的高通量药物筛选")
+        
+        # 输入参数
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            screen_target = st.text_input("靶点", "EGFR", key="screen_target")
+            screen_library = st.selectbox(
+                "化合物库",
+                ["FDA批准药物", "临床候选药物", "天然产物"],
+                key="screen_library"
+            )
+        
+        with col2:
+            screen_top_n = st.slider("返回数量", 5, 50, 10, key="screen_top_n")
+            screen_action = st.selectbox("操作", ["筛选化合物", "分析结果", "优化筛选"], key="screen_action")
+        
+        if st.button("🔍 开始筛选", key="btn_screening", use_container_width=True):
+            with st.spinner("正在筛选化合物..."):
+                try:
+                    sys.path.insert(0, str(Path(__file__).parent / "src"))
+                    from drug_screener import DrugScreener
+                    
+                    screener = DrugScreener()
+                    
+                    if screen_action == "筛选化合物":
+                        # 筛选化合物
+                        hits = screener.screen_compounds(screen_target, screen_library, screen_top_n)
+                        
+                        # 显示结果
+                        st.success(f"筛选完成! 找到 {len(hits)} 个命中化合物")
+                        
+                        # 显示结果表格
+                        import pandas as pd
+                        data = []
+                        for hit in hits:
+                            data.append({
+                                "名称": hit.name,
+                                "SMILES": hit.smiles[:30] + "...",
+                                "活性": f"{hit.activity*100:.1f}%",
+                                "选择性": f"{hit.selectivity*100:.1f}%",
+                                "类药性": f"{hit.drug_likeness*100:.1f}%",
+                                "置信度": f"{hit.confidence*100:.1f}%"
+                            })
+                        
+                        df = pd.DataFrame(data)
+                        st.dataframe(df, use_container_width=True)
+                        
+                        # 显示最佳命中
+                        if hits:
+                            st.subheader("最佳命中化合物")
+                            
+                            best = hits[0]
+                            col1, col2, col3, col4 = st.columns(4)
+                            with col1:
+                                st.metric("名称", best.name)
+                            with col2:
+                                st.metric("活性", f"{best.activity*100:.1f}%")
+                            with col3:
+                                st.metric("选择性", f"{best.selectivity*100:.1f}%")
+                            with col4:
+                                st.metric("类药性", f"{best.drug_likeness*100:.1f}%")
+                    
+                    elif screen_action == "分析结果":
+                        # 先筛选
+                        hits = screener.screen_compounds(screen_target, screen_library, screen_top_n)
+                        
+                        # 分析结果
+                        analysis = screener.analyze_screning_results(hits)
+                        
+                        if "error" in analysis:
+                            st.error(analysis["error"])
+                        else:
+                            # 显示分析结果
+                            st.success("分析完成!")
+                            
+                            # 显示统计信息
+                            st.subheader("统计信息")
+                            
+                            col1, col2, col3, col4 = st.columns(4)
+                            with col1:
+                                st.metric("总命中数", analysis["total_hits"])
+                            with col2:
+                                st.metric("平均活性", f"{analysis['avg_activity']*100:.1f}%")
+                            with col3:
+                                st.metric("平均选择性", f"{analysis['avg_selectivity']*100:.1f}%")
+                            with col4:
+                                st.metric("平均类药性", f"{analysis['avg_drug_likeness']*100:.1f}%")
+                            
+                            # 显示最佳命中
+                            st.subheader("最佳命中")
+                            
+                            best = analysis["best_hit"]
+                            st.metric("名称", best["name"])
+                            st.metric("活性", f"{best['activity']*100:.1f}%")
+                            st.metric("选择性", f"{best['selectivity']*100:.1f}%")
+                            
+                            # 显示建议
+                            st.subheader("建议")
+                            for rec in analysis["recommendations"]:
+                                st.info(rec)
+                    
+                    else:  # 优化筛选
+                        # 先筛选
+                        hits = screener.screen_compounds(screen_target, screen_library, screen_top_n)
+                        
+                        # 优化筛选
+                        optimized_hits = screener.optimize_screening(screen_target, hits)
+                        
+                        # 显示结果
+                        st.success(f"优化完成! 优化后 {len(optimized_hits)} 个命中化合物")
+                        
+                        # 显示结果表格
+                        import pandas as pd
+                        data = []
+                        for hit in optimized_hits:
+                            data.append({
+                                "名称": hit.name,
+                                "SMILES": hit.smiles[:30] + "...",
+                                "活性": f"{hit.activity*100:.1f}%",
+                                "选择性": f"{hit.selectivity*100:.1f}%",
+                                "类药性": f"{hit.drug_likeness*100:.1f}%",
+                                "置信度": f"{hit.confidence*100:.1f}%"
+                            })
+                        
+                        df = pd.DataFrame(data)
+                        st.dataframe(df, use_container_width=True)
+                    
+                except Exception as e:
+                    st.error(f"药物筛选失败: {e}")
+    
+    # ===== Tab 14: 数据浏览 =====
+    with tab14:
         st.header("数据浏览")
         st.markdown("浏览本地化合物库和靶点库")
         
@@ -1330,8 +1465,8 @@ def main():
                 st.dataframe(df, use_container_width=True)
                 st.caption(f"共 {len(targets)} 个靶点")
     
-    # ===== Tab 14: 全流程演示 =====
-    with tab14:
+    # ===== Tab 15: 全流程演示 =====
+    with tab15:
         st.header("全流程演示")
         st.markdown("展示完整的药物发现流程")
         
