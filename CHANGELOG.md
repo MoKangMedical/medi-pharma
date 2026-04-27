@@ -5,21 +5,22 @@ All notable changes to MediPharma will be documented in this file.
 ## [2.1.0] - 2026-04-27
 
 ### Added
-- Streamlit Web界面 (`app.py`) - 完整的可视化操作界面
-- Demo示例数据 - 10个热门药物和10个热门靶点
-- GitHub Actions CI/CD - 自动化测试和部署
-- Docker完整部署支持 - Dockerfile + docker-compose.yml
-- 完整单元测试套件 (`tests/test_comprehensive.py`)
-- 6个AI Agents模块
-- 全流程Pipeline编排器
-
-### Changed
-- 更新requirements.txt添加streamlit依赖
-- 更新README.md文档
-- 优化项目结构
+- Streamlit Web界面 (app.py) - 5个功能标签页，专业UI设计
+- 本地化合物库 (data/local_compound_library.json) - 30个常见药物分子
+- 端到端闭环演示脚本 (demo_e2e.py)
+- 完整单元测试套件 (tests/test_comprehensive.py) - 18个测试
+- GitHub Actions CI/CD配置
+- Docker完整部署支持
 
 ### Fixed
-- Docker配置完善
+- 分子生成器SMILES质量问题 - 使用RDKit BRICS确保有效性
+- 虚拟筛选本地化合物库支持 - 无需网络即可运行
+- conftest.py导入路径修复
+
+### Changed
+- 放宽分子生成属性过滤
+- 更新README.md文档
+- 优化Streamlit前端UI
 
 ## [2.0.0] - 2026-04-15
 
