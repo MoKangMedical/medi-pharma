@@ -317,7 +317,7 @@ def main():
     st.divider()
     
     # 功能标签页
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12, tab13, tab14, tab15, tab16, tab17 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12, tab13, tab14, tab15, tab16, tab17, tab18 = st.tabs([
         "🎯 虚拟筛选", 
         "🧬 分子生成", 
         "💊 ADMET预测",
@@ -333,6 +333,7 @@ def main():
         "🔍 药物筛选",
         "🎨 药物设计",
         "🤖 数字孪生",
+        "🧬 多组学数据",
         "📊 数据浏览",
         "🔄 全流程演示"
     ])
@@ -1732,8 +1733,163 @@ def main():
                 except Exception as e:
                     st.error(f"数字孪生创建失败: {e}")
     
-    # ===== Tab 16: 数据浏览 =====
+    # ===== Tab 16: 多组学数据 =====
     with tab16:
+        st.header("多组学数据集成")
+        st.markdown("整合基因组学、转录组学、蛋白质组学等多组学数据")
+        
+        # 输入参数
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            omics_type = st.selectbox(
+                "数据类型",
+                ["基因组学", "转录组学", "蛋白质组学", "代谢组学", "表观基因组学"],
+                key="omics_type"
+            )
+            omics_n_genes = st.slider("基因数量", 5, 20, 10, key="omics_n_genes")
+        
+        with col2:
+            omics_action = st.selectbox(
+                "操作",
+                ["生成组学数据", "整合多组学", "分析通路", "识别生物标志物"],
+                key="omics_action"
+            )
+        
+        if st.button("🧬 分析组学数据", key="btn_omics", use_container_width=True):
+            with st.spinner("正在分析组学数据..."):
+                try:
+                    sys.path.insert(0, str(Path(__file__).parent / "src"))
+                    from multi_omics import MultiOmicsIntegrator
+                    
+                    integrator = MultiOmicsIntegrator()
+                    
+                    if omics_action == "生成组学数据":
+                        # 生成组学数据
+                        omics_data = integrator.generate_omics_data(omics_type, omics_n_genes)
+                        
+                        # 显示结果
+                        st.success("组学数据生成完成!")
+                        
+                        # 显示基本信息
+                        st.subheader("数据信息")
+                        
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.metric("数据类型", omics_data.data_type)
+                        with col2:
+                            st.metric("基因数量", len(omics_data.genes))
+                        with col3:
+                            st.metric("数据点", len(omics_data.values))
+                        
+                        # 显示数据
+                        st.subheader("组学数据")
+                        
+                        import pandas as pd
+                        df = pd.DataFrame([
+                            {"基因": gene, "值": value}
+                            for gene, value in omics_data.values.items()
+                        ])
+                        st.dataframe(df, use_container_width=True)
+                    
+                    elif omics_action == "整合多组学":
+                        # 生成多种组学数据
+                        omics_list = []
+                        for otype in ["基因组学", "转录组学", "蛋白质组学"]:
+                            data = integrator.generate_omics_data(otype, omics_n_genes)
+                            omics_list.append(data)
+                        
+                        # 整合数据
+                        integration = integrator.integrate_omics(omics_list)
+                        
+                        if "error" in integration:
+                            st.error(integration["error"])
+                        else:
+                            # 显示结果
+                            st.success("多组学数据整合完成!")
+                            
+                            # 显示统计信息
+                            st.subheader("整合统计")
+                            
+                            col1, col2, col3 = st.columns(3)
+                            with col1:
+                                st.metric("总基因数", integration["n_genes"])
+                            with col2:
+                                st.metric("组学类型", integration["n_omics"])
+                            with col3:
+                                st.metric("数据点", len(integration["integrated_data"]))
+                            
+                            # 显示各组学统计
+                            st.subheader("各组学统计")
+                            for omics_type, stats in integration["statistics"].items():
+                                st.markdown(f"**{omics_type}**")
+                                col1, col2, col3 = st.columns(3)
+                                with col1:
+                                    st.metric("均值", stats["mean"])
+                                with col2:
+                                    st.metric("最小值", stats["min"])
+                                with col3:
+                                    st.metric("最大值", stats["max"])
+                            
+                            # 显示建议
+                            st.subheader("分析建议")
+                            for rec in integration["recommendations"]:
+                                st.info(rec)
+                    
+                    elif omics_action == "分析通路":
+                        # 生成组学数据
+                        omics_data = integrator.generate_omics_data(omics_type, omics_n_genes)
+                        
+                        # 分析通路
+                        pathway_analysis = integrator.analyze_pathways(omics_data.genes, omics_type)
+                        
+                        # 显示结果
+                        st.success("通路分析完成!")
+                        
+                        # 显示统计信息
+                        st.subheader("通路分析")
+                        
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.metric("总通路数", pathway_analysis["total_pathways"])
+                        with col2:
+                            st.metric("富集通路数", pathway_analysis["enriched_count"])
+                        
+                        # 显示富集通路
+                        st.subheader("富集通路")
+                        for pathway_name, info in pathway_analysis["enriched_pathways"].items():
+                            with st.expander(f"{pathway_name} (富集分数: {info['enrichment_score']})"):
+                                st.markdown(f"**重叠基因**: {', '.join(info['overlap'])}")
+                                st.metric("富集分数", info["enrichment_score"])
+                                st.metric("p值", info["p_value"])
+                        
+                        # 显示建议
+                        st.subheader("分析建议")
+                        for rec in pathway_analysis["recommendations"]:
+                            st.info(rec)
+                    
+                    else:  # 识别生物标志物
+                        # 生成组学数据
+                        omics_data = integrator.generate_omics_data(omics_type, omics_n_genes)
+                        
+                        # 识别生物标志物
+                        biomarkers = integrator.identify_biomarkers(omics_data, 5)
+                        
+                        # 显示结果
+                        st.success(f"识别完成! 找到 {len(biomarkers)} 个潜在生物标志物")
+                        
+                        # 显示生物标志物
+                        st.subheader("潜在生物标志物")
+                        
+                        import pandas as pd
+                        df = pd.DataFrame(biomarkers)
+                        st.dataframe(df, use_container_width=True)
+                    
+                except Exception as e:
+                    st.error(f"组学数据分析失败: {e}")
+    
+    # ===== Tab 17: 数据浏览 =====
+    with tab17:
         st.header("数据浏览")
         st.markdown("浏览本地化合物库和靶点库")
         
@@ -1753,8 +1909,8 @@ def main():
                 st.dataframe(df, use_container_width=True)
                 st.caption(f"共 {len(targets)} 个靶点")
     
-    # ===== Tab 17: 全流程演示 =====
-    with tab17:
+    # ===== Tab 18: 全流程演示 =====
+    with tab18:
         st.header("全流程演示")
         st.markdown("展示完整的药物发现流程")
         
