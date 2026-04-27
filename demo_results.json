@@ -1,0 +1,141 @@
+{
+  "timestamp": "2026-04-27T22:06:55.933884",
+  "target": {
+    "name": "EGFR",
+    "chembl_id": "CHEMBL203",
+    "disease": "非小细胞肺癌",
+    "description": "表皮生长因子受体，肺癌重要治疗靶点"
+  },
+  "screening": {
+    "total_screened": 30,
+    "hits_found": 5,
+    "top_candidates": [
+      {
+        "smiles": "CC(C)C1=C(C(=O)NC2=CC=CC=C2)C(=C(N1CCC(CC(CC(=O)O)O)O)C1=CC=C(C=C1)F)C1=CC=CC=C1",
+        "predicted_pkd": 8.0,
+        "confidence": 0.8,
+        "percentile_rank": 100.0,
+        "is_hit": true,
+        "name": "Atorvastatin",
+        "chembl_id": "CHEMBL1487",
+        "mw": 558.64,
+        "logp": 4.06
+      },
+      {
+        "smiles": "CCCC1=NC(=C(N1CC1=CC=C(C=C1)C1=CC=CC=C1C1=NNN=N1)CO)Cl",
+        "predicted_pkd": 7.5,
+        "confidence": 0.75,
+        "percentile_rank": 96.7,
+        "is_hit": true,
+        "name": "Losartan",
+        "chembl_id": "CHEMBL191",
+        "mw": 422.91,
+        "logp": 4.01
+      },
+      {
+        "smiles": "CCOC(=O)C1=C(NC(=C(C1C1=CC=CC=C1Cl)C(=O)OC)C)COCCN",
+        "predicted_pkd": 7.5,
+        "confidence": 0.75,
+        "percentile_rank": 96.7,
+        "is_hit": true,
+        "name": "Amlodipine",
+        "chembl_id": "CHEMBL1491",
+        "mw": 408.88,
+        "logp": 3.0
+      },
+      {
+        "smiles": "COC1=CC2=NC(=CC(=O)N2C=C1)CS(=O)C1=NC2=CC=CC=C2N1C",
+        "predicted_pkd": 7.0,
+        "confidence": 0.7,
+        "percentile_rank": 90.0,
+        "is_hit": true,
+        "name": "Omeprazole",
+        "chembl_id": "CHEMBL1503",
+        "mw": 345.42,
+        "logp": 2.23
+      },
+      {
+        "smiles": "C1CC1N2C=C(C(=O)C3=CC(=C(C=C32)N4CCNCC4)F)C(=O)O",
+        "predicted_pkd": 6.0,
+        "confidence": 0.6,
+        "percentile_rank": 86.7,
+        "is_hit": true,
+        "name": "Ciprofloxacin",
+        "chembl_id": "CHEMBL8",
+        "mw": 331.34,
+        "logp": 0.28
+      }
+    ]
+  },
+  "generation": {
+    "total_generated": 30,
+    "valid_molecules": 32,
+    "top_candidates": [
+      {
+        "smiles": "CCCC(=O)Nc1cccc2nccnc12",
+        "mw": 215.3,
+        "logp": 2.37,
+        "hbd": 1,
+        "hba": 3,
+        "tpsa": 54.9,
+        "qed": 0.855,
+        "sa_score": 2.75,
+        "rotatable_bonds": 3,
+        "rings": 2
+      },
+      {
+        "smiles": "CCNc1nccccccc2ccccc12",
+        "mw": 224.3,
+        "logp": 3.79,
+        "hbd": 1,
+        "hba": 2,
+        "tpsa": 24.9,
+        "qed": 0.839,
+        "sa_score": 2.5,
+        "rotatable_bonds": 2,
+        "rings": 2
+      },
+      {
+        "smiles": "CCCNC(=O)c1cccc2ccccc12",
+        "mw": 213.3,
+        "logp": 2.98,
+        "hbd": 1,
+        "hba": 1,
+        "tpsa": 29.1,
+        "qed": 0.834,
+        "sa_score": 2.75,
+        "rotatable_bonds": 3,
+        "rings": 2
+      },
+      {
+        "smiles": "COCCOC(=O)Nc1cccc2[nH]ccc12",
+        "mw": 234.3,
+        "logp": 2.36,
+        "hbd": 2,
+        "hba": 3,
+        "tpsa": 63.4,
+        "qed": 0.798,
+        "sa_score": 3.0,
+        "rotatable_bonds": 4,
+        "rings": 2
+      },
+      {
+        "smiles": "CCNc1ncccc1Br",
+        "mw": 201.1,
+        "logp": 2.28,
+        "hbd": 1,
+        "hba": 2,
+        "tpsa": 24.9,
+        "qed": 0.793,
+        "sa_score": 2.0,
+        "rotatable_bonds": 2,
+        "rings": 1
+      }
+    ]
+  },
+  "admet_evaluation": {
+    "total_evaluated": 6,
+    "passed": 6,
+    "failed": 0
+  }
+}

@@ -1,7 +1,7 @@
 import pytest
 import asyncio
 from fastapi.testclient import TestClient
-from src.main import app
+from backend.api import app
 
 @pytest.fixture(scope="session")
 def event_loop():
