@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 """
-MediPharma — Streamlit Web UI
-AI驱动药物发现平台
+MediPharma — AI Drug Discovery Platform
+Streamlit Web UI v2.1
 
 启动: streamlit run app.py --server.port 8095
 """
 
 import streamlit as st
-import requests
 import json
-import pandas as pd
+import sys
+from pathlib import Path
 from datetime import datetime
-import time
 
-# ===== 配置 =====
-API_BASE = "http://localhost:8000/api/v1"
+# 添加项目路径
+sys.path.insert(0, str(Path(__file__).parent))
 
+# ===== 页面配置 =====
 st.set_page_config(
     page_title="MediPharma — AI Drug Discovery",
     page_icon="💊",
@@ -26,84 +26,259 @@ st.set_page_config(
 # ===== 自定义CSS =====
 st.markdown("""
 <style>
-    .main { padding-top: 2rem; }
-    .stTabs [data-baseweb="tab-list"] { gap: 8px; }
-    .stTabs [data-baseweb="tab"] {
-        background-color: #f0f2f6;
-        border-radius: 4px 4px 0 0;
-        padding: 10px 20px;
+    /* 全局样式 */
+    .main {
+        padding-top: 1rem;
     }
-    .stTabs [aria-selected="true"] {
-        background-color: #1a73e8;
-        color: white;
+    
+    /* 侧边栏样式 */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
     }
-    .metric-card {
+    
+    [data-testid="stSidebar"] .stMarkdown {
+        color: #e0e0e0;
+    }
+    
+    /* 标题样式 */
+    h1 {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+    }
+    
+    h2, h3 {
+        color: #1a1a2e;
+    }
+    
+    /* 指标卡片 */
+    [data-testid="stMetric"] {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 20px;
-        border-radius: 10px;
+        border-radius: 12px;
+        color: white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    [data-testid="stMetric"] label {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    [data-testid="stMetric"] [data-testid="stMetricValue"] {
+        color: white !important;
+    }
+    
+    /* 按钮样式 */
+    .stButton > button {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    /* 标签页样式 */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background: #f8f9fa;
+        padding: 8px;
+        border-radius: 12px;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background: transparent;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 600;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
         color: white;
     }
-    .feature-card {
-        background: #f8f9fa;
-        padding: 15px;
+    
+    /* 表格样式 */
+    .stDataFrame {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* 成功/警告消息 */
+    .stAlert {
         border-radius: 8px;
-        border-left: 4px solid #1a73e8;
+    }
+    
+    /* 分割线 */
+    hr {
+        border: none;
+        height: 2px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        margin: 2rem 0;
+    }
+    
+    /* 功能卡片 */
+    .feature-card {
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid #667eea;
+        margin-bottom: 16px;
+    }
+    
+    .feature-card h4 {
+        color: #1a1a2e;
+        margin-bottom: 8px;
+    }
+    
+    .feature-card p {
+        color: #666;
+        margin: 0;
+    }
+    
+    /* 底部信息 */
+    .footer {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .footer a {
+        color: #667eea;
+        text-decoration: none;
     }
 </style>
 """, unsafe_allow_html=True)
 
 
-def call_api(endpoint: str, method: str = "GET", data: dict = None):
-    """调用后端API"""
-    url = f"{API_BASE}{endpoint}"
+def load_local_data():
+    """加载本地数据"""
+    data_dir = Path(__file__).parent / "data"
+    
+    compounds = []
+    targets = []
+    
+    compounds_file = data_dir / "demo_compounds.json"
+    targets_file = data_dir / "demo_targets.json"
+    
+    if compounds_file.exists():
+        with open(compounds_file) as f:
+            compounds = json.load(f)
+    
+    if targets_file.exists():
+        with open(targets_file) as f:
+            targets = json.load(f)
+    
+    return compounds, targets
+
+
+def run_admet_prediction(smiles_list):
+    """运行ADMET预测"""
     try:
-        if method == "GET":
-            resp = requests.get(url, timeout=30)
-        else:
-            resp = requests.post(url, json=data, timeout=60)
-        resp.raise_for_status()
-        return resp.json()
-    except requests.exceptions.ConnectionError:
-        return {"error": "API服务未启动，请先运行: uvicorn backend.api:app --port 8000"}
+        from admet_prediction.engine import ADMETEngine
+        engine = ADMETEngine()
+        results = []
+        for smiles in smiles_list:
+            if smiles.strip():
+                report = engine.predict(smiles.strip())
+                results.append({
+                    "smiles": smiles.strip(),
+                    "report": report
+                })
+        return results
     except Exception as e:
-        return {"error": str(e)}
+        st.error(f"ADMET预测失败: {e}")
+        return []
+
+
+def run_virtual_screening(target_id, max_compounds):
+    """运行虚拟筛选"""
+    try:
+        from virtual_screening.engine import VirtualScreeningEngine
+        engine = VirtualScreeningEngine()
+        result = engine.screen(
+            target_chembl_id=target_id,
+            max_compounds=max_compounds,
+            top_n=10,
+            library_source="local"
+        )
+        return result
+    except Exception as e:
+        st.error(f"虚拟筛选失败: {e}")
+        return None
+
+
+def run_molecular_generation(target_name, n_generate):
+    """运行分子生成"""
+    try:
+        from molecular_generation.engine import MolecularGenerationEngine
+        engine = MolecularGenerationEngine()
+        result = engine.generate_candidates(
+            target_name=target_name,
+            n_generate=n_generate,
+            top_n=10
+        )
+        return result
+    except Exception as e:
+        st.error(f"分子生成失败: {e}")
+        return None
 
 
 def main():
+    # 加载数据
+    compounds, targets = load_local_data()
+    
     # ===== 侧边栏 =====
     with st.sidebar:
-        st.image("https://img.icons8.com/fluency/96/pill.png", width=64)
-        st.title("MediPharma")
-        st.caption("AI Drug Discovery Platform")
+        st.markdown("## 💊 MediPharma")
+        st.markdown("**AI Drug Discovery Platform**")
         
         st.divider()
-        st.markdown("### 数据源")
-        st.markdown("- ChEMBL 2.4M+ 化合物")
-        st.markdown("- OpenTargets 60K+ 靶点")
-        st.markdown("- UniProt 蛋白质注释")
+        
+        st.markdown("### 📊 数据源")
+        st.markdown(f"- 化合物库: {len(compounds)} 个")
+        st.markdown(f"- 靶点库: {len(targets)} 个")
         
         st.divider()
-        st.markdown("### 技术栈")
-        st.markdown("- Python 3.9+")
-        st.markdown("- RDKit / PyTorch")
-        st.markdown("- FastAPI / Streamlit")
+        
+        st.markdown("### 🔬 核心功能")
+        st.markdown("- 虚拟筛选")
+        st.markdown("- 分子生成")
+        st.markdown("- ADMET预测")
+        st.markdown("- 全流程Pipeline")
         
         st.divider()
-        st.markdown("### 链接")
+        
+        st.markdown("### 🔗 链接")
         st.markdown("[GitHub](https://github.com/MoKangMedical/medi-pharma)")
         st.markdown("[API文档](http://localhost:8000/docs)")
-        st.markdown("[MoKangMedical](https://github.com/MoKangMedical)")
-
+        
+        st.divider()
+        
+        st.markdown("### ℹ️ 关于")
+        st.markdown("MediPharma v2.1.0")
+        st.markdown("Built by MoKangMedical")
+    
     # ===== 主界面 =====
-    st.title("💊 MediPharma — AI药物发现平台")
-    st.markdown("**基于ChEMBL 2.4M化合物和OpenTargets靶点数据的全流程AI药物发现**")
+    st.title("MediPharma")
+    st.markdown("**AI驱动的药物发现平台** — 基于ChEMBL 2.4M化合物和OpenTargets靶点数据")
     
     # 指标卡片
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("化合物库", "2.4M+", "ChEMBL")
+        st.metric("化合物库", f"{len(compounds)}", "本地数据")
     with col2:
-        st.metric("靶点", "60K+", "OpenTargets")
+        st.metric("靶点库", f"{len(targets)}", "热门靶点")
     with col3:
         st.metric("ADMET模型", "20+", "预测属性")
     with col4:
@@ -112,205 +287,212 @@ def main():
     st.divider()
     
     # 功能标签页
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "🎯 靶点发现", "🔬 虚拟筛选", "🧬 分子生成", 
-        "💊 ADMET预测", "⚗️ 先导优化", "🔄 全流程Pipeline"
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "🎯 虚拟筛选", 
+        "🧬 分子生成", 
+        "💊 ADMET预测",
+        "📊 数据浏览",
+        "🔄 全流程演示"
     ])
     
-    # ===== Tab 1: 靶点发现 =====
+    # ===== Tab 1: 虚拟筛选 =====
     with tab1:
-        st.header("靶点发现")
-        st.markdown("基于文献挖掘和知识图谱，发现疾病相关靶点")
-        
-        col1, col2 = st.columns([2, 1])
-        with col1:
-            disease = st.text_input("目标疾病", "重症肌无力", key="target_disease")
-        with col2:
-            max_papers = st.number_input("最大文献数", 10, 100, 30, key="target_papers")
-        
-        if st.button("🔍 开始靶点发现", key="btn_target"):
-            with st.spinner("正在分析文献和靶点数据..."):
-                result = call_api("/targets/discover", "POST", {
-                    "disease": disease,
-                    "max_papers": max_papers,
-                    "top_n": 10
-                })
-                
-                if "error" in result:
-                    st.error(result["error"])
-                else:
-                    st.success(f"发现 {result.get('total_candidates', 0)} 个候选靶点")
-                    
-                    if "top_targets" in result:
-                        df = pd.DataFrame(result["top_targets"])
-                        st.dataframe(df, use_container_width=True)
-    
-    # ===== Tab 2: 虚拟筛选 =====
-    with tab2:
         st.header("虚拟筛选")
-        st.markdown("AI模型筛选候选化合物，预测结合亲和力")
+        st.markdown("从化合物库中筛选潜在的药物候选分子")
         
         col1, col2 = st.columns([2, 1])
         with col1:
-            target_id = st.text_input("靶点ChEMBL ID", "CHEMBL2364162", key="screen_target")
+            target_options = {t["gene_symbol"]: t["target_id"] for t in targets}
+            selected_target = st.selectbox(
+                "选择靶点",
+                options=list(target_options.keys()),
+                index=0
+            )
         with col2:
-            max_compounds = st.number_input("筛选化合物数", 100, 10000, 1000, key="screen_compounds")
+            max_compounds = st.slider("筛选数量", 10, 100, 30)
         
-        if st.button("🔬 开始虚拟筛选", key="btn_screen"):
-            with st.spinner("正在筛选化合物库..."):
-                result = call_api("/screening/virtual", "POST", {
-                    "target_chembl_id": target_id,
-                    "max_compounds": max_compounds,
-                    "top_n": 20
-                })
+        if st.button("🔍 开始筛选", key="btn_screen", use_container_width=True):
+            with st.spinner("正在执行虚拟筛选..."):
+                target_id = target_options[selected_target]
+                result = run_virtual_screening(target_id, max_compounds)
                 
-                if "error" in result:
-                    st.error(result["error"])
-                else:
-                    st.success(f"筛选完成: {result.get('hits_found', 0)} 个Hit化合物")
+                if result and result.top_candidates:
+                    st.success(f"筛选完成! 发现 {result.hits_found} 个Hit化合物")
                     
-                    if "top_candidates" in result:
-                        df = pd.DataFrame(result["top_candidates"])
-                        st.dataframe(df, use_container_width=True)
+                    # 显示结果表格
+                    import pandas as pd
+                    df = pd.DataFrame(result.top_candidates)
+                    if "smiles" in df.columns:
+                        display_cols = ["name", "smiles", "predicted_pkd", "confidence"]
+                        display_cols = [c for c in display_cols if c in df.columns]
+                        st.dataframe(df[display_cols], use_container_width=True)
+                    
+                    # 下载结果
+                    csv = df.to_csv(index=False)
+                    st.download_button(
+                        "📥 下载结果",
+                        csv,
+                        "screening_results.csv",
+                        "text/csv"
+                    )
     
-    # ===== Tab 3: 分子生成 =====
-    with tab3:
-        st.header("分子生成")
-        st.markdown("基于AI生成新型候选分子")
+    # ===== Tab 2: 分子生成 =====
+    with tab2:
+        st.header("AI分子生成")
+        st.markdown("使用AI生成新型候选药物分子")
         
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns([2, 1])
         with col1:
-            gen_target = st.text_input("靶点名称", "EGFR", key="gen_target")
+            gen_target = st.selectbox(
+                "选择靶点",
+                options=list(target_options.keys()),
+                index=0,
+                key="gen_target"
+            )
         with col2:
-            gen_n = st.number_input("生成数量", 10, 500, 100, key="gen_n")
-        with col3:
-            gen_top = st.number_input("展示Top", 5, 50, 20, key="gen_top")
+            n_generate = st.slider("生成数量", 10, 100, 30, key="gen_n")
         
-        if st.button("🧬 开始分子生成", key="btn_gen"):
+        if st.button("🧬 开始生成", key="btn_gen", use_container_width=True):
             with st.spinner("正在生成候选分子..."):
-                result = call_api("/molecule/generate", "POST", {
-                    "target_name": gen_target,
-                    "n_generate": gen_n,
-                    "top_n": gen_top
-                })
+                result = run_molecular_generation(gen_target, n_generate)
                 
-                if "error" in result:
-                    st.error(result["error"])
-                else:
-                    st.success(f"生成完成: {result.get('valid_molecules', 0)} 个有效分子")
+                if result and result.top_candidates:
+                    st.success(f"生成完成! 有效分子 {result.valid_molecules} 个")
                     
-                    if "top_candidates" in result:
-                        df = pd.DataFrame(result["top_candidates"])
-                        st.dataframe(df, use_container_width=True)
+                    # 显示结果
+                    import pandas as pd
+                    df = pd.DataFrame(result.top_candidates)
+                    if "smiles" in df.columns:
+                        display_cols = ["smiles", "mw", "logp", "qed", "sa_score"]
+                        display_cols = [c for c in display_cols if c in df.columns]
+                        st.dataframe(df[display_cols], use_container_width=True)
+                    
+                    # 下载结果
+                    csv = df.to_csv(index=False)
+                    st.download_button(
+                        "📥 下载结果",
+                        csv,
+                        "generation_results.csv",
+                        "text/csv"
+                    )
     
-    # ===== Tab 4: ADMET预测 =====
-    with tab4:
+    # ===== Tab 3: ADMET预测 =====
+    with tab3:
         st.header("ADMET预测")
         st.markdown("预测化合物的吸收、分布、代谢、排泄和毒性")
         
         smiles_input = st.text_area(
-            "输入SMILES (每行一个或逗号分隔)",
+            "输入SMILES (每行一个)",
             "CC(=O)OC1=CC=CC=C1C(=O)O\nCCO\nCC(=O)NC1=CC=C(O)C=C1",
+            height=150,
             key="admet_smiles"
         )
         
-        if st.button("💊 开始ADMET预测", key="btn_admet"):
-            smiles_list = [s.strip() for s in smiles_input.replace(",", "\n").split("\n") if s.strip()]
+        if st.button("💊 开始预测", key="btn_admet", use_container_width=True):
+            smiles_list = [s.strip() for s in smiles_input.split("\n") if s.strip()]
             
-            with st.spinner(f"正在预测 {len(smiles_list)} 个化合物的ADMET..."):
-                result = call_api("/admet/predict", "POST", {
-                    "smiles_list": smiles_list
-                })
-                
-                if "error" in result:
-                    st.error(result["error"])
-                else:
-                    st.success("ADMET预测完成")
+            if smiles_list:
+                with st.spinner(f"正在预测 {len(smiles_list)} 个化合物..."):
+                    results = run_admet_prediction(smiles_list)
                     
-                    if "predictions" in result:
-                        for pred in result["predictions"]:
-                            with st.expander(f"SMILES: {pred.get('smiles', '')[:30]}..."):
-                                col1, col2, col3 = st.columns(3)
+                    if results:
+                        st.success(f"预测完成! 共 {len(results)} 个化合物")
+                        
+                        for i, item in enumerate(results):
+                            report = item["report"]
+                            smiles = item["smiles"]
+                            
+                            with st.expander(f"化合物 {i+1}: {smiles[:30]}..."):
+                                col1, col2, col3, col4 = st.columns(4)
                                 with col1:
-                                    st.metric("综合评分", pred.get("overall", "N/A"))
+                                    st.metric("综合评分", f"{report.overall['total_score']:.2f}")
                                 with col2:
-                                    st.metric("吸收", pred.get("absorption", "N/A"))
+                                    st.metric("吸收", f"{report.overall['absorption']:.2f}")
                                 with col3:
-                                    st.metric("毒性", pred.get("toxicity", "N/A"))
+                                    st.metric("毒性", f"{report.overall['toxicity']:.2f}")
+                                with col4:
+                                    status = "✅ PASS" if report.pass_filter else "❌ FAIL"
+                                    st.metric("状态", status)
                                 
-                                st.json(pred)
+                                # 详细属性
+                                st.json({
+                                    "absorption": report.absorption,
+                                    "distribution": report.distribution,
+                                    "metabolism": report.metabolism,
+                                    "toxicity": report.toxicity
+                                })
     
-    # ===== Tab 5: 先导优化 =====
+    # ===== Tab 4: 数据浏览 =====
+    with tab4:
+        st.header("数据浏览")
+        st.markdown("浏览本地化合物库和靶点库")
+        
+        data_tab1, data_tab2 = st.tabs(["化合物库", "靶点库"])
+        
+        with data_tab1:
+            if compounds:
+                import pandas as pd
+                df = pd.DataFrame(compounds)
+                st.dataframe(df, use_container_width=True)
+                st.caption(f"共 {len(compounds)} 个化合物")
+        
+        with data_tab2:
+            if targets:
+                import pandas as pd
+                df = pd.DataFrame(targets)
+                st.dataframe(df, use_container_width=True)
+                st.caption(f"共 {len(targets)} 个靶点")
+    
+    # ===== Tab 5: 全流程演示 =====
     with tab5:
-        st.header("先导化合物优化")
-        st.markdown("基于AI的分子结构优化，改善ADMET性质")
+        st.header("全流程演示")
+        st.markdown("展示完整的药物发现流程")
         
-        opt_smiles = st.text_input("输入先导化合物SMILES", "CC(=O)OC1=CC=CC=C1C(=O)O", key="opt_smiles")
+        st.info("点击下方按钮运行完整的药物发现Pipeline：靶点发现 → 虚拟筛选 → 分子生成 → ADMET预测 → 综合报告")
         
-        if st.button("⚗️ 开始优化", key="btn_opt"):
-            with st.spinner("正在优化分子结构..."):
-                result = call_api("/molecule/optimize", "POST", {
-                    "smiles": opt_smiles,
-                    "n_generate": 10
-                })
+        if st.button("🚀 启动全流程", key="btn_pipeline", use_container_width=True):
+            with st.spinner("正在执行全流程Pipeline...这可能需要1-2分钟"):
+                # 运行演示脚本
+                import subprocess
+                result = subprocess.run(
+                    ["python3.12", "demo_e2e.py"],
+                    capture_output=True,
+                    text=True,
+                    cwd=str(Path(__file__).parent)
+                )
                 
-                if "error" in result:
-                    st.error(result["error"])
-                else:
-                    st.success(f"优化完成: 生成 {result.get('total_generated', 0)} 个衍生物")
-                    
-                    if "optimized_molecules" in result:
-                        df = pd.DataFrame(result["optimized_molecules"])
-                        st.dataframe(df, use_container_width=True)
-    
-    # ===== Tab 6: 全流程Pipeline =====
-    with tab6:
-        st.header("全流程Pipeline")
-        st.markdown("从疾病到候选药物的自动化全流程")
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            pipe_disease = st.text_input("目标疾病", "非小细胞肺癌", key="pipe_disease")
-        with col2:
-            pipe_target = st.text_input("靶点 (可选，留空自动发现)", "", key="pipe_target")
-        
-        if st.button("🔄 启动全流程", key="btn_pipe"):
-            with st.spinner("正在执行全流程Pipeline...这可能需要几分钟"):
-                result = call_api("/pipeline/run", "POST", {
-                    "disease": pipe_disease,
-                    "target": pipe_target if pipe_target else None,
-                    "auto_mode": True
-                })
-                
-                if "error" in result:
-                    st.error(result["error"])
-                else:
+                if result.returncode == 0:
                     st.success("全流程Pipeline完成!")
                     
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        st.metric("完成阶段", len(result.get("stages_completed", [])))
-                    with col2:
-                        st.metric("最终候选", len(result.get("final_candidates", [])))
-                    with col3:
-                        st.metric("耗时", f"{result.get('execution_time', 0):.1f}s")
-                    
-                    st.markdown("### 流程阶段")
-                    st.json(result.get("stages_completed", []))
-                    
-                    if result.get("final_candidates"):
-                        st.markdown("### 最终候选药物")
-                        df = pd.DataFrame(result["final_candidates"])
-                        st.dataframe(df, use_container_width=True)
+                    # 读取结果
+                    results_file = Path(__file__).parent / "demo_results.json"
+                    if results_file.exists():
+                        with open(results_file) as f:
+                            demo_results = json.load(f)
+                        
+                        # 显示摘要
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.metric("筛选化合物", demo_results["screening"]["total_screened"])
+                        with col2:
+                            st.metric("生成分子", demo_results["generation"]["valid_molecules"])
+                        with col3:
+                            st.metric("ADMET通过", demo_results["admet_evaluation"]["passed"])
+                        
+                        # 显示详细输出
+                        st.text(result.stdout[-2000:])  # 最后2000字符
+                else:
+                    st.error("Pipeline执行失败")
+                    st.text(result.stderr[-1000:])
     
-    # ===== 底部信息 =====
+    # ===== 底部 =====
     st.divider()
     st.markdown("""
-    <div style='text-align: center; color: #666;'>
-        <p>MediPharma v2.0 — AI Drug Discovery Platform</p>
-        <p>Built by MoKangMedical | 
-           <a href='https://github.com/MoKangMedical/medi-pharma'>GitHub</a> | 
-           <a href='https://mokangmedical.github.io/medi-pharma/'>Documentation</a></p>
+    <div class="footer">
+        <p>MediPharma v2.1.0 — AI Drug Discovery Platform</p>
+        <p>Built by <a href="https://github.com/MoKangMedical">MoKangMedical</a> | 
+           <a href="https://github.com/MoKangMedical/medi-pharma">GitHub</a> | 
+           MIT License</p>
     </div>
     """, unsafe_allow_html=True)
 
