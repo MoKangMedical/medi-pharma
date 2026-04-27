@@ -317,7 +317,7 @@ def main():
     st.divider()
     
     # 功能标签页
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12, tab13 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12, tab13, tab14 = st.tabs([
         "🎯 虚拟筛选", 
         "🧬 分子生成", 
         "💊 ADMET预测",
@@ -329,6 +329,7 @@ def main():
         "🧬 蛋白质结构",
         "💊 药物组合",
         "🎯 多靶点设计",
+        "⚗️ 药物优化",
         "📊 数据浏览",
         "🔄 全流程演示"
     ])
@@ -1185,8 +1186,131 @@ def main():
                 except Exception as e:
                     st.error(f"多靶点药物设计失败: {e}")
     
-    # ===== Tab 12: 数据浏览 =====
+    # ===== Tab 12: 药物优化 =====
     with tab12:
+        st.header("药物优化")
+        st.markdown("基于AI优化药物分子的ADMET性质")
+        
+        # 输入参数
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            opt_smiles = st.text_input("药物SMILES", "CC(=O)OC1=CC=CC=C1C(=O)O", key="opt_smiles")
+        
+        with col2:
+            opt_action = st.selectbox("操作", ["优化药物", "分析优化潜力", "建议修饰"], key="opt_action")
+        
+        if st.button("⚗️ 优化药物", key="btn_optimize", use_container_width=True):
+            with st.spinner("正在优化药物..."):
+                try:
+                    sys.path.insert(0, str(Path(__file__).parent / "src"))
+                    from drug_optimizer import DrugOptimizer
+                    
+                    optimizer = DrugOptimizer()
+                    
+                    if opt_action == "优化药物":
+                        # 优化药物
+                        optimization = optimizer.optimize_drug(opt_smiles)
+                        
+                        # 显示结果
+                        st.success("药物优化完成!")
+                        
+                        # 显示基本信息
+                        st.subheader("优化结果")
+                        
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.metric("优化分数", f"{optimization.optimization_score*100:.1f}%")
+                        with col2:
+                            st.metric("方法", optimization.method)
+                        with col3:
+                            st.metric("改进项", len(optimization.improvements))
+                        
+                        # 显示优化前后对比
+                        st.subheader("分子对比")
+                        
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            st.markdown("**原始分子**")
+                            st.code(optimization.original_smiles)
+                        
+                        with col2:
+                            st.markdown("**优化后分子**")
+                            st.code(optimization.optimized_smiles)
+                        
+                        # 显示改进
+                        st.subheader("改进详情")
+                        
+                        for key, value in optimization.improvements.items():
+                            if value > 0:
+                                st.success(f"**{key}**: +{value*100:.1f}%")
+                            else:
+                                st.warning(f"**{key}**: {value*100:.1f}%")
+                    
+                    elif opt_action == "分析优化潜力":
+                        # 分析优化潜力
+                        analysis = optimizer.analyze_optimization_potential(opt_smiles)
+                        
+                        if "error" in analysis:
+                            st.error(analysis["error"])
+                        else:
+                            # 显示结果
+                            st.success("优化潜力分析完成!")
+                            
+                            # 显示属性
+                            st.subheader("分子属性")
+                            
+                            props = analysis["properties"]
+                            col1, col2, col3, col4, col5 = st.columns(5)
+                            with col1:
+                                st.metric("分子量", props["molecular_weight"])
+                            with col2:
+                                st.metric("LogP", props["logp"])
+                            with col3:
+                                st.metric("HBD", props["hbd"])
+                            with col4:
+                                st.metric("HBA", props["hba"])
+                            with col5:
+                                st.metric("QED", props["qed"])
+                            
+                            # 显示优化潜力
+                            st.subheader("优化潜力")
+                            
+                            for key, value in analysis["optimization_potential"].items():
+                                if value == "高":
+                                    st.warning(f"**{key}**: {value}")
+                                elif value == "中":
+                                    st.info(f"**{key}**: {value}")
+                                else:
+                                    st.success(f"**{key}**: {value}")
+                            
+                            # 显示总体潜力
+                            st.metric("总体优化潜力", analysis["overall_potential"])
+                            
+                            # 显示建议
+                            st.subheader("优化建议")
+                            for rec in analysis["recommendations"]:
+                                st.info(rec)
+                    
+                    else:  # 建议修饰
+                        # 建议修饰
+                        suggestions = optimizer.suggest_modifications(opt_smiles)
+                        
+                        # 显示结果
+                        st.success(f"找到 {len(suggestions)} 个修饰建议!")
+                        
+                        # 显示建议
+                        for i, suggestion in enumerate(suggestions):
+                            with st.expander(f"建议 {i+1}: {suggestion['type']}"):
+                                st.markdown(f"**描述**: {suggestion['description']}")
+                                st.markdown(f"**预期效果**: {suggestion['expected_effect']}")
+                    
+                except Exception as e:
+                    st.error(f"药物优化失败: {e}")
+    
+    # ===== Tab 13: 数据浏览 =====
+    with tab13:
         st.header("数据浏览")
         st.markdown("浏览本地化合物库和靶点库")
         
@@ -1206,8 +1330,8 @@ def main():
                 st.dataframe(df, use_container_width=True)
                 st.caption(f"共 {len(targets)} 个靶点")
     
-    # ===== Tab 13: 全流程演示 =====
-    with tab13:
+    # ===== Tab 14: 全流程演示 =====
+    with tab14:
         st.header("全流程演示")
         st.markdown("展示完整的药物发现流程")
         
