@@ -3,15 +3,20 @@
 整合化合物库、分子对接、亲和力评分，输出Top候选化合物
 """
 
+import json
 import logging
 from dataclasses import dataclass, asdict
 from typing import Optional
+from pathlib import Path
 
 from .compound_library import CompoundLibrary, Compound
 from .docking import DockingEngine
 from .scorer import AffinityScorer
 
 logger = logging.getLogger(__name__)
+
+# 本地化合物库路径
+LOCAL_LIBRARY_PATH = Path(__file__).parent.parent / "data" / "local_compound_library.json"
 
 
 @dataclass
@@ -40,12 +45,34 @@ class VirtualScreeningEngine:
         self.library = CompoundLibrary()
         self.docking = docking_engine or DockingEngine(output_dir=output_dir)
         self.scorer = AffinityScorer(hit_threshold=hit_threshold)
+        self._local_compounds = self._load_local_library()
+
+    def _load_local_library(self) -> list[Compound]:
+        """加载本地化合物库"""
+        compounds = []
+        if LOCAL_LIBRARY_PATH.exists():
+            try:
+                with open(LOCAL_LIBRARY_PATH) as f:
+                    data = json.load(f)
+                for item in data:
+                    compounds.append(Compound(
+                        smiles=item.get("smiles", ""),
+                        name=item.get("name", ""),
+                        chembl_id=item.get("chembl_id", ""),
+                        mw=item.get("mw", 0),
+                        logp=item.get("logp", 0),
+                        activity=item.get("activity", 0),
+                    ))
+                logger.info(f"加载本地化合物库: {len(compounds)} 个化合物")
+            except Exception as e:
+                logger.warning(f"本地化合物库加载失败: {e}")
+        return compounds
 
     def screen(
         self,
         target_chembl_id: str,
         protein_pdb: Optional[str] = None,
-        library_source: str = "chembl",
+        library_source: str = "local",
         max_compounds: int = 500,
         top_n: int = 20,
         use_docking: bool = False
@@ -56,7 +83,7 @@ class VirtualScreeningEngine:
         Args:
             target_chembl_id: ChEMBL靶点ID
             protein_pdb: 蛋白质PDB文件路径（对接用）
-            library_source: 化合物库来源 (chembl/pubchem)
+            library_source: 化合物库来源 (local/chembl/pubchem)
             max_compounds: 最大筛选数
             top_n: 返回Top N结果
             use_docking: 是否执行分子对接
@@ -65,15 +92,18 @@ class VirtualScreeningEngine:
 
         # Step 1: 获取化合物库
         logger.info("Step 1: 获取化合物库...")
-        if library_source == "chembl":
+        if library_source == "local":
+            compounds = self._local_compounds[:max_compounds]
+        elif library_source == "chembl":
             compounds = self.library.fetch_target_compounds(
                 target_chembl_id, limit=max_compounds
             )
+            if not compounds:
+                # 回退到本地库
+                logger.info("ChEMBL获取失败，使用本地化合物库")
+                compounds = self._local_compounds[:max_compounds]
         else:
-            # 可扩展其他来源
-            compounds = self.library.fetch_target_compounds(
-                target_chembl_id, limit=max_compounds
-            )
+            compounds = self._local_compounds[:max_compounds]
 
         if not compounds:
             return ScreeningResult(
