@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 MediPharma — AI Drug Discovery Platform
-Streamlit Web UI v2.1
+Streamlit Web UI v3.0
 
 启动: streamlit run app.py --server.port 8095
 """
@@ -112,37 +112,12 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     
-    /* 成功/警告消息 */
-    .stAlert {
-        border-radius: 8px;
-    }
-    
     /* 分割线 */
     hr {
         border: none;
         height: 2px;
         background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
         margin: 2rem 0;
-    }
-    
-    /* 功能卡片 */
-    .feature-card {
-        background: white;
-        padding: 24px;
-        border-radius: 12px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        border-left: 4px solid #667eea;
-        margin-bottom: 16px;
-    }
-    
-    .feature-card h4 {
-        color: #1a1a2e;
-        margin-bottom: 8px;
-    }
-    
-    .feature-card p {
-        color: #666;
-        margin: 0;
     }
     
     /* 底部信息 */
@@ -234,6 +209,60 @@ def run_molecular_generation(target_name, n_generate):
         return None
 
 
+def render_mol_2d(smiles: str, width: int = 300, height: int = 200):
+    """渲染2D分子结构"""
+    try:
+        from rdkit import Chem
+        from rdkit.Chem import Draw
+        import base64
+        import io
+        
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            st.warning("无效的SMILES")
+            return
+        
+        img = Draw.MolToImage(mol, size=(width, height))
+        
+        buffer = io.BytesIO()
+        img.save(buffer, format='PNG')
+        img_str = base64.b64encode(buffer.getvalue()).decode()
+        
+        st.markdown(
+            f'<div style="text-align: center;"><img src="data:image/png;base64,{img_str}" width="{width}"></div>',
+            unsafe_allow_html=True
+        )
+    except Exception as e:
+        st.warning(f"渲染失败: {e}")
+
+
+def render_mol_properties(smiles: str):
+    """渲染分子属性"""
+    try:
+        from rdkit import Chem
+        from rdkit.Chem import Descriptors, QED
+        
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            return
+        
+        props = {
+            "分子量": f"{Descriptors.MolWt(mol):.1f}",
+            "LogP": f"{Descriptors.MolLogP(mol):.2f}",
+            "氢键供体": Descriptors.NumHDonors(mol),
+            "氢键受体": Descriptors.NumHAcceptors(mol),
+            "极性表面积": f"{Descriptors.TPSA(mol):.1f}",
+            "QED": f"{QED.qed(mol):.3f}",
+        }
+        
+        cols = st.columns(3)
+        for i, (key, value) in enumerate(props.items()):
+            with cols[i % 3]:
+                st.metric(key, value)
+    except Exception as e:
+        st.warning(f"计算属性失败: {e}")
+
+
 def main():
     # 加载数据
     compounds, targets = load_local_data()
@@ -255,6 +284,7 @@ def main():
         st.markdown("- 虚拟筛选")
         st.markdown("- 分子生成")
         st.markdown("- ADMET预测")
+        st.markdown("- 分子可视化")
         st.markdown("- 全流程Pipeline")
         
         st.divider()
@@ -266,7 +296,7 @@ def main():
         st.divider()
         
         st.markdown("### ℹ️ 关于")
-        st.markdown("MediPharma v2.1.0")
+        st.markdown("MediPharma v3.0.0")
         st.markdown("Built by MoKangMedical")
     
     # ===== 主界面 =====
@@ -287,10 +317,11 @@ def main():
     st.divider()
     
     # 功能标签页
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "🎯 虚拟筛选", 
         "🧬 分子生成", 
         "💊 ADMET预测",
+        "🔬 分子可视化",
         "📊 数据浏览",
         "🔄 全流程演示"
     ])
@@ -414,7 +445,10 @@ def main():
                                     status = "✅ PASS" if report.pass_filter else "❌ FAIL"
                                     st.metric("状态", status)
                                 
-                                # 详细属性
+                                # 显示2D结构
+                                render_mol_2d(smiles)
+                                
+                                # 显示详细属性
                                 st.json({
                                     "absorption": report.absorption,
                                     "distribution": report.distribution,
@@ -422,8 +456,46 @@ def main():
                                     "toxicity": report.toxicity
                                 })
     
-    # ===== Tab 4: 数据浏览 =====
+    # ===== Tab 4: 分子可视化 =====
     with tab4:
+        st.header("分子可视化")
+        st.markdown("查看分子的2D结构和属性")
+        
+        # 从化合物库选择或手动输入
+        col1, col2 = st.columns([1, 1])
+        
+        with col1:
+            st.subheader("从化合物库选择")
+            if compounds:
+                compound_names = [c.get("name", f"化合物 {i}") for i, c in enumerate(compounds)]
+                selected_compound = st.selectbox("选择化合物", compound_names)
+                selected_idx = compound_names.index(selected_compound)
+                selected_smiles = compounds[selected_idx].get("smiles", "")
+            else:
+                selected_smiles = ""
+        
+        with col2:
+            st.subheader("或手动输入SMILES")
+            manual_smiles = st.text_input("SMILES", "CC(=O)OC1=CC=CC=C1C(=O)O")
+        
+        # 使用选择的或手动输入的SMILES
+        display_smiles = selected_smiles if selected_smiles else manual_smiles
+        
+        if display_smiles:
+            st.divider()
+            
+            col1, col2 = st.columns([1, 1])
+            
+            with col1:
+                st.subheader("2D结构")
+                render_mol_2d(display_smiles, width=400, height=300)
+            
+            with col2:
+                st.subheader("分子属性")
+                render_mol_properties(display_smiles)
+    
+    # ===== Tab 5: 数据浏览 =====
+    with tab5:
         st.header("数据浏览")
         st.markdown("浏览本地化合物库和靶点库")
         
@@ -443,8 +515,8 @@ def main():
                 st.dataframe(df, use_container_width=True)
                 st.caption(f"共 {len(targets)} 个靶点")
     
-    # ===== Tab 5: 全流程演示 =====
-    with tab5:
+    # ===== Tab 6: 全流程演示 =====
+    with tab6:
         st.header("全流程演示")
         st.markdown("展示完整的药物发现流程")
         
@@ -489,7 +561,7 @@ def main():
     st.divider()
     st.markdown("""
     <div class="footer">
-        <p>MediPharma v2.1.0 — AI Drug Discovery Platform</p>
+        <p>MediPharma v3.0.0 — AI Drug Discovery Platform</p>
         <p>Built by <a href="https://github.com/MoKangMedical">MoKangMedical</a> | 
            <a href="https://github.com/MoKangMedical/medi-pharma">GitHub</a> | 
            MIT License</p>
