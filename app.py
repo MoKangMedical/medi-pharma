@@ -317,7 +317,7 @@ def main():
     st.divider()
     
     # 功能标签页
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12 = st.tabs([
         "🎯 虚拟筛选", 
         "🧬 分子生成", 
         "💊 ADMET预测",
@@ -327,6 +327,7 @@ def main():
         "🏥 临床试验",
         "📋 监管合规",
         "🧬 蛋白质结构",
+        "💊 药物组合",
         "📊 数据浏览",
         "🔄 全流程演示"
     ])
@@ -969,8 +970,112 @@ def main():
                 except Exception as e:
                     st.error(f"蛋白质结构预测失败: {e}")
     
-    # ===== Tab 10: 数据浏览 =====
+    # ===== Tab 10: 药物组合 =====
     with tab10:
+        st.header("药物组合发现")
+        st.markdown("基于AI预测药物组合的协同效应")
+        
+        # 输入参数
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            combo_drug1 = st.text_input("药物1 SMILES", "CC(=O)OC1=CC=CC=C1C(=O)O", key="combo_drug1")
+            combo_drug2 = st.text_input("药物2 SMILES", "CN(C)C(=N)NC(=N)N", key="combo_drug2")
+        
+        with col2:
+            combo_indication = st.text_input("适应症", "心血管疾病", key="combo_indication")
+            combo_action = st.selectbox("操作", ["预测协同效应", "查找组合", "优化组合"], key="combo_action")
+        
+        if st.button("💊 预测药物组合", key="btn_combination", use_container_width=True):
+            with st.spinner("正在预测药物组合..."):
+                try:
+                    sys.path.insert(0, str(Path(__file__).parent / "src"))
+                    from drug_combination import DrugCombinationPredictor
+                    
+                    predictor = DrugCombinationPredictor()
+                    
+                    if combo_action == "预测协同效应":
+                        # 预测协同效应
+                        combination = predictor.predict_synergy(combo_drug1, combo_drug2, combo_indication)
+                        
+                        # 显示结果
+                        st.success("药物组合预测完成!")
+                        
+                        # 显示基本信息
+                        st.subheader("协同效应预测")
+                        
+                        col1, col2, col3, col4 = st.columns(4)
+                        with col1:
+                            st.metric("协同分数", f"{combination.synergy_score*100:.1f}%")
+                        with col2:
+                            st.metric("毒性风险", f"{combination.toxicity_risk*100:.1f}%")
+                        with col3:
+                            st.metric("机制", combination.mechanism)
+                        with col4:
+                            st.metric("适应症", combination.indication)
+                        
+                        # 显示详细信息
+                        st.subheader("详细信息")
+                        
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            st.markdown("**药物1**")
+                            st.info(combination.drug1)
+                            
+                            st.markdown("**药物2**")
+                            st.info(combination.drug2)
+                        
+                        with col2:
+                            st.markdown("**协同机制**")
+                            st.info(combination.mechanism)
+                            
+                            st.markdown("**适应症**")
+                            st.info(combination.indication)
+                    
+                    elif combo_action == "查找组合":
+                        # 查找组合
+                        combinations = predictor.find_combinations(combo_drug1, combo_indication)
+                        
+                        # 显示结果
+                        st.success(f"找到 {len(combinations)} 个潜在组合!")
+                        
+                        # 显示结果表格
+                        import pandas as pd
+                        df = pd.DataFrame(combinations)
+                        st.dataframe(df, use_container_width=True)
+                    
+                    else:  # 优化组合
+                        # 优化组合
+                        optimization = predictor.optimize_combination(combo_drug1, combo_drug2, combo_indication)
+                        
+                        # 显示结果
+                        st.success("药物组合优化完成!")
+                        
+                        # 显示优化建议
+                        st.subheader("优化建议")
+                        
+                        for rec in optimization["recommendations"]:
+                            st.info(rec)
+                        
+                        # 显示其他信息
+                        st.subheader("其他信息")
+                        
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            st.markdown("**最佳比例**")
+                            st.info(optimization["optimal_ratio"])
+                        
+                        with col2:
+                            st.markdown("**建议剂量**")
+                            st.info(optimization["suggested_dose"])
+                    
+                except Exception as e:
+                    st.error(f"药物组合预测失败: {e}")
+    
+    # ===== Tab 11: 数据浏览 =====
+    with tab11:
         st.header("数据浏览")
         st.markdown("浏览本地化合物库和靶点库")
         
@@ -990,8 +1095,8 @@ def main():
                 st.dataframe(df, use_container_width=True)
                 st.caption(f"共 {len(targets)} 个靶点")
     
-    # ===== Tab 11: 全流程演示 =====
-    with tab11:
+    # ===== Tab 12: 全流程演示 =====
+    with tab12:
         st.header("全流程演示")
         st.markdown("展示完整的药物发现流程")
         
