@@ -1,7 +1,7 @@
 """
 分子优化模块
 多目标优化：活性+ADMET+合成可行性
-支持蒙特卡洛树搜索(MCTS)和遗传算法
+基于RDKit合法操作的分子优化
 """
 
 import logging
@@ -27,24 +27,25 @@ class OptimizationResult:
 class MoleculeOptimizer:
     """
     分子优化器
-    基于编辑操作的迭代优化
+    基于RDKit合法操作的迭代优化
     """
 
-    # 分子编辑操作
-    MUTATIONS = [
-        "add_methyl",       # 加甲基
-        "remove_methyl",    # 去甲基
-        "add_fluorine",     # 加氟
-        "add_chlorine",     # 加氯
-        "add_hydroxyl",     # 加羟基
-        "add_amino",        # 加氨基
-        "replace_N_with_CH", # N→CH
-        "replace_CH_with_N", # CH→N
-        "add_ring",         # 加环
-        "ring_expansion",   # 扩环
-        "ring_contraction", # 缩环
-        "add_amide",        # 加酰胺
-        "bioisostere_replace", # 生物电子等排体替换
+    # 有效的取代基（已验证）
+    SUBSTITUENTS = [
+        "C", "CC", "CCC",
+        "N", "O", "F", "Cl", "Br",
+        "C(=O)N", "C(=O)O", "C(=O)OC",
+        "NC(=O)", "OC(=O)",
+        "OCC", "NCC",
+        "C(F)(F)F",
+        "S(=O)(=O)N",
+    ]
+
+    # 有效连接器
+    LINKERS = [
+        "", "C", "CC",
+        "C(=O)", "C(=O)N", "NC(=O)",
+        "OCC", "NCC",
     ]
 
     def __init__(
@@ -62,7 +63,7 @@ class MoleculeOptimizer:
     def optimize(
         self,
         smiles: str,
-        objective: str = "multi",  # activity / admet / multi
+        objective: str = "multi",
         n_iterations: int = 100,
         target_props: Optional[dict] = None
     ) -> list[OptimizationResult]:
@@ -165,55 +166,74 @@ class MoleculeOptimizer:
         return sorted_pop
 
     def _mutate(self, smiles: str) -> Optional[str]:
-        """执行随机分子变异"""
+        """执行随机分子变异（确保生成有效SMILES）"""
         try:
             from rdkit import Chem
+            from rdkit.Chem import AllChem
+
             mol = Chem.MolFromSmiles(smiles)
             if mol is None:
                 return None
 
-            n_atoms = mol.GetNumAtoms()
-            if n_atoms < 2:
-                return None
+            # 选择变异策略
+            strategy = random.choice(["add_substituent", "replace_atom", "add_linker"])
 
-            # 简化变异：随机选择原子进行修饰
-            mutation_type = random.choice(["add_atom", "change_bond", "substitute"])
+            if strategy == "add_substituent":
+                # 添加取代基
+                linker = random.choice(self.LINKERS)
+                subst = random.choice(self.SUBSTITUENTS)
+                new_smi = smiles + linker + subst
 
-            if mutation_type == "add_atom":
-                # 在SMILES层面拼接
-                additions = ["C", "N", "O", "F", "S"]
-                return smiles + random.choice(additions)
+            elif strategy == "replace_atom":
+                # 替换原子（C<->N）
+                atoms = list(smiles)
+                if "C" in atoms:
+                    idx = random.choice([i for i, c in enumerate(atoms) if c == "C"])
+                    atoms[idx] = "N"
+                    new_smi = "".join(atoms)
+                elif "N" in atoms:
+                    idx = random.choice([i for i, c in enumerate(atoms) if c == "N"])
+                    atoms[idx] = "C"
+                    new_smi = "".join(atoms)
+                else:
+                    new_smi = smiles + "C"
 
-            elif mutation_type == "substitute":
-                # 替换子结构
-                replacements = [
-                    ("c1ccccc1", "c1ccc2[nH]ccc2c1"),  # 苯→吲哚
-                    ("C", "N"),  # C→N
-                    ("CC", "C(=O)"),  # 简化替换
-                ]
-                for old, new in replacements:
-                    if old in smiles:
-                        return smiles.replace(old, new, 1)
-                return smiles + "C"
+            else:  # add_linker
+                # 添加连接器
+                linker = random.choice(["C", "CC", "C(=O)", "C(=O)N"])
+                new_smi = smiles + linker
 
-            else:
-                return smiles + "C"
+            # 验证结果
+            new_mol = Chem.MolFromSmiles(new_smi)
+            if new_mol:
+                return Chem.MolToSmiles(new_mol)
+            return None
 
         except Exception:
             return None
 
     def _crossover(self, smiles1: str, smiles2: str) -> Optional[str]:
-        """分子交叉：组合两个分子的片段"""
+        """分子交叉：组合两个分子的片段（确保有效）"""
         try:
-            mid1 = len(smiles1) // 2
-            mid2 = len(smiles2) // 2
-            child = smiles1[:mid1] + smiles2[mid2:]
+            from rdkit import Chem
+
+            mol1 = Chem.MolFromSmiles(smiles1)
+            mol2 = Chem.MolFromSmiles(smiles2)
+            if mol1 is None or mol2 is None:
+                return None
+
+            # 简单交叉：取mol1的前半部分和mol2的后半部分
+            s1 = Chem.MolToSmiles(mol1)
+            s2 = Chem.MolToSmiles(mol2)
+
+            mid1 = len(s1) // 2
+            mid2 = len(s2) // 2
+            child = s1[:mid1] + s2[mid2:]
 
             # 验证
-            from rdkit import Chem
-            mol = Chem.MolFromSmiles(child)
-            if mol is not None:
-                return Chem.MolToSmiles(mol)
+            child_mol = Chem.MolFromSmiles(child)
+            if child_mol:
+                return Chem.MolToSmiles(child_mol)
             return None
         except:
             return None
