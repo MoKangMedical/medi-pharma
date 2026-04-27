@@ -1,0 +1,92 @@
+[
+  {
+    "chembl_id": "CHEMBL25",
+    "name": "Aspirin",
+    "smiles": "CC(=O)OC1=CC=CC=C1C(=O)O",
+    "molecular_weight": 180.16,
+    "logp": 1.2,
+    "target": "COX-1/COX-2",
+    "indication": "Pain, inflammation, fever"
+  },
+  {
+    "chembl_id": "CHEMBL1200766",
+    "name": "Ibuprofen",
+    "smiles": "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O",
+    "molecular_weight": 206.28,
+    "logp": 3.97,
+    "target": "COX-1/COX-2",
+    "indication": "Pain, inflammation"
+  },
+  {
+    "chembl_id": "CHEMBL112",
+    "name": "Metformin",
+    "smiles": "CN(C)C(=N)NC(=N)N",
+    "molecular_weight": 129.16,
+    "logp": -1.43,
+    "target": "AMPK",
+    "indication": "Type 2 diabetes"
+  },
+  {
+    "chembl_id": "CHEMBL885",
+    "name": "Omeprazole",
+    "smiles": "COC1=CC2=NC(=CC(=O)N2C=C1)CS(=O)C1=NC2=CC=CC=C2N1C",
+    "molecular_weight": 345.42,
+    "logp": 2.23,
+    "target": "H+/K+ ATPase",
+    "indication": "GERD, peptic ulcer"
+  },
+  {
+    "chembl_id": "CHEMBL1200456",
+    "name": "Atorvastatin",
+    "smiles": "CC(C)C1=C(C(=O)NC2=CC=CC=C2)C(=C(N1CCC(CC(CC(=O)O)O)O)C1=CC=C(C=C1)F)C1=CC=CC=C1",
+    "molecular_weight": 558.64,
+    "logp": 4.06,
+    "target": "HMG-CoA reductase",
+    "indication": "Hyperlipidemia"
+  },
+  {
+    "chembl_id": "CHEMBL1200941",
+    "name": "Amlodipine",
+    "smiles": "CCOC(=O)C1=C(NC(=C(C1C1=CC=CC=C1Cl)C(=O)OC)C)COCCN",
+    "molecular_weight": 408.88,
+    "logp": 3.0,
+    "target": "L-type calcium channel",
+    "indication": "Hypertension, angina"
+  },
+  {
+    "chembl_id": "CHEMBL649",
+    "name": "Paracetamol",
+    "smiles": "CC(=O)NC1=CC=C(O)C=C1",
+    "molecular_weight": 151.16,
+    "logp": 0.46,
+    "target": "COX-1/COX-2",
+    "indication": "Pain, fever"
+  },
+  {
+    "chembl_id": "CHEMBL1200502",
+    "name": "Losartan",
+    "smiles": "CCCC1=NC(=C(N1CC1=CC=C(C=C1)C1=CC=CC=C1C1=NNN=N1)CO)Cl",
+    "molecular_weight": 422.91,
+    "logp": 4.01,
+    "target": "AT1 receptor",
+    "indication": "Hypertension"
+  },
+  {
+    "chembl_id": "CHEMBL1370",
+    "name": "Ciprofloxacin",
+    "smiles": "C1CC1N2C=C(C(=O)C3=CC(=C(C=C32)N4CCNCC4)F)C(=O)O",
+    "molecular_weight": 331.34,
+    "logp": 0.28,
+    "target": "DNA gyrase",
+    "indication": "Bacterial infections"
+  },
+  {
+    "chembl_id": "CHEMBL1200647",
+    "name": "Omeprazole",
+    "smiles": "COC1=CC2=NC(=CC(=O)N2C=C1)CS(=O)C1=NC2=CC=CC=C2N1C",
+    "molecular_weight": 345.42,
+    "logp": 2.23,
+    "target": "H+/K+ ATPase",
+    "indication": "GERD"
+  }
+]
