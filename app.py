@@ -317,7 +317,7 @@ def main():
     st.divider()
     
     # 功能标签页
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12, tab13, tab14, tab15, tab16 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12, tab13, tab14, tab15, tab16, tab17 = st.tabs([
         "🎯 虚拟筛选", 
         "🧬 分子生成", 
         "💊 ADMET预测",
@@ -332,6 +332,7 @@ def main():
         "⚗️ 药物优化",
         "🔍 药物筛选",
         "🎨 药物设计",
+        "🤖 数字孪生",
         "📊 数据浏览",
         "🔄 全流程演示"
     ])
@@ -1574,8 +1575,165 @@ def main():
                 except Exception as e:
                     st.error(f"药物设计失败: {e}")
     
-    # ===== Tab 15: 数据浏览 =====
+    # ===== Tab 15: 数字孪生 =====
     with tab15:
+        st.header("数字孪生")
+        st.markdown("基于AI的临床试验数字孪生技术")
+        
+        # 输入参数
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            dt_patient_id = st.text_input("患者ID", "patient_001", key="dt_patient_id")
+            dt_indication = st.text_input("适应症", "非小细胞肺癌", key="dt_indication")
+        
+        with col2:
+            dt_treatment = st.text_input("治疗方案", "靶向治疗", key="dt_treatment")
+            dt_action = st.selectbox("操作", ["创建数字孪生", "创建合成对照组", "分析试验结果", "优化试验设计"], key="dt_action")
+        
+        if st.button("🤖 创建数字孪生", key="btn_digital_twin", use_container_width=True):
+            with st.spinner("正在创建数字孪生..."):
+                try:
+                    sys.path.insert(0, str(Path(__file__).parent / "src"))
+                    from digital_twin import DigitalTwinEngine
+                    
+                    engine = DigitalTwinEngine()
+                    
+                    if dt_action == "创建数字孪生":
+                        # 创建数字孪生
+                        twin = engine.create_digital_twin(dt_patient_id, dt_indication, dt_treatment)
+                        
+                        # 显示结果
+                        st.success("数字孪生创建完成!")
+                        
+                        # 显示基本信息
+                        st.subheader("患者信息")
+                        
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.metric("患者ID", twin.patient_id)
+                        with col2:
+                            st.metric("置信度", f"{twin.confidence*100:.1f}%")
+                        with col3:
+                            st.metric("方法", twin.method)
+                        
+                        # 显示患者特征
+                        st.subheader("患者特征")
+                        
+                        for key, value in twin.characteristics.items():
+                            if isinstance(value, dict):
+                                st.markdown(f"**{key}**")
+                                for k, v in value.items():
+                                    st.metric(k, v)
+                            else:
+                                st.metric(key, value)
+                        
+                        # 显示预测结果
+                        st.subheader("预测结果")
+                        
+                        for key, value in twin.predicted_outcomes.items():
+                            if value == "有效" or value == "良好" or value == "高":
+                                st.success(f"**{key}**: {value}")
+                            elif value == "部分有效" or value == "轻度不良反应" or value == "中":
+                                st.warning(f"**{key}**: {value}")
+                            else:
+                                st.error(f"**{key}**: {value}")
+                    
+                    elif dt_action == "创建合成对照组":
+                        # 创建合成对照组
+                        twins = engine.create_synthetic_control_arm(10, dt_indication)
+                        
+                        # 显示结果
+                        st.success(f"创建完成! 生成 {len(twins)} 个数字孪生")
+                        
+                        # 显示统计信息
+                        st.subheader("统计信息")
+                        
+                        # 统计年龄分布
+                        ages = [twin.characteristics["年龄"] for twin in twins]
+                        st.metric("平均年龄", f"{sum(ages)/len(ages):.1f}")
+                        
+                        # 统计性别分布
+                        males = sum(1 for twin in twins if twin.characteristics["性别"] == "男")
+                        st.metric("男性比例", f"{males/len(twins)*100:.1f}%")
+                        
+                        # 显示数字孪生列表
+                        st.subheader("数字孪生列表")
+                        
+                        import pandas as pd
+                        data = []
+                        for twin in twins:
+                            data.append({
+                                "患者ID": twin.patient_id,
+                                "年龄": twin.characteristics["年龄"],
+                                "性别": twin.characteristics["性别"],
+                                "疗效": twin.predicted_outcomes["疗效"],
+                                "安全性": twin.predicted_outcomes["安全性"],
+                            })
+                        
+                        df = pd.DataFrame(data)
+                        st.dataframe(df, use_container_width=True)
+                    
+                    elif dt_action == "分析试验结果":
+                        # 先创建数字孪生
+                        twins = engine.create_synthetic_control_arm(20, dt_indication)
+                        
+                        # 分析结果
+                        analysis = engine.analyze_trial_outcomes(twins, dt_indication)
+                        
+                        if "error" in analysis:
+                            st.error(analysis["error"])
+                        else:
+                            # 显示分析结果
+                            st.success("分析完成!")
+                            
+                            # 显示统计信息
+                            st.subheader("试验结果")
+                            
+                            col1, col2, col3 = st.columns(3)
+                            with col1:
+                                st.metric("总患者数", analysis["total_patients"])
+                            with col2:
+                                st.metric("有效率", f"{analysis['efficacy']['有效率']*100:.1f}%")
+                            with col3:
+                                st.metric("良好率", f"{analysis['safety']['良好率']*100:.1f}%")
+                            
+                            # 显示详细结果
+                            st.subheader("疗效分析")
+                            for key, value in analysis["efficacy"].items():
+                                st.metric(key, f"{value*100:.1f}%")
+                            
+                            st.subheader("安全性分析")
+                            for key, value in analysis["safety"].items():
+                                st.metric(key, f"{value*100:.1f}%")
+                            
+                            # 显示建议
+                            st.subheader("建议")
+                            for rec in analysis["recommendations"]:
+                                st.info(rec)
+                    
+                    else:  # 优化试验设计
+                        # 优化试验设计
+                        optimization = engine.optimize_trial_design(dt_indication, dt_treatment)
+                        
+                        # 显示结果
+                        st.success("优化完成!")
+                        
+                        # 显示建议
+                        st.subheader("优化建议")
+                        for rec in optimization["recommendations"]:
+                            st.info(rec)
+                        
+                        # 显示预期效果
+                        st.subheader("预期效果")
+                        for key, value in optimization["expected_effects"].items():
+                            st.metric(key, f"{value*100:.1f}%")
+                    
+                except Exception as e:
+                    st.error(f"数字孪生创建失败: {e}")
+    
+    # ===== Tab 16: 数据浏览 =====
+    with tab16:
         st.header("数据浏览")
         st.markdown("浏览本地化合物库和靶点库")
         
@@ -1595,8 +1753,8 @@ def main():
                 st.dataframe(df, use_container_width=True)
                 st.caption(f"共 {len(targets)} 个靶点")
     
-    # ===== Tab 16: 全流程演示 =====
-    with tab16:
+    # ===== Tab 17: 全流程演示 =====
+    with tab17:
         st.header("全流程演示")
         st.markdown("展示完整的药物发现流程")
         
