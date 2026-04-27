@@ -1,0 +1,112 @@
+[
+  {
+    "target_id": "CHEMBL2364162",
+    "gene_symbol": "EGFR",
+    "name": "Epidermal growth factor receptor",
+    "organism": "Homo sapiens",
+    "target_class": "Kinase",
+    "druggability": 0.95,
+    "disease_areas": ["Non-small cell lung cancer", "Colorectal cancer", "Head and neck cancer"],
+    "approved_drugs": 15,
+    "description": "EGFR is a transmembrane protein that is a member of the ErbB family of receptors. Mutations and overexpression of EGFR have been implicated in many cancers."
+  },
+  {
+    "target_id": "CHEMBL203",
+    "gene_symbol": "HER2",
+    "name": "Receptor tyrosine-protein kinase erbB-2",
+    "organism": "Homo sapiens",
+    "target_class": "Kinase",
+    "druggability": 0.92,
+    "disease_areas": ["Breast cancer", "Gastric cancer"],
+    "approved_drugs": 8,
+    "description": "HER2 is a member of the epidermal growth factor receptor family. Amplification or overexpression of HER2 plays an important role in the development and progression of breast cancer."
+  },
+  {
+    "target_id": "CHEMBL240",
+    "gene_symbol": "BRAF",
+    "name": "Serine/threonine-protein kinase B-Raf",
+    "organism": "Homo sapiens",
+    "target_class": "Kinase",
+    "druggability": 0.90,
+    "disease_areas": ["Melanoma", "Colorectal cancer", "Thyroid cancer"],
+    "approved_drugs": 6,
+    "description": "BRAF is a human gene that makes a protein called B-Raf. The BRAF V600E mutation is found in about 50% of melanomas."
+  },
+  {
+    "target_id": "CHEMBL2056",
+    "gene_symbol": "PD-L1",
+    "name": "Programmed death-ligand 1",
+    "organism": "Homo sapiens",
+    "target_class": "Immune checkpoint",
+    "druggability": 0.88,
+    "disease_areas": ["Non-small cell lung cancer", "Melanoma", "Bladder cancer"],
+    "approved_drugs": 5,
+    "description": "PD-L1 is a protein that acts as a kind of 'off switch' to keep the immune system from attacking normal cells. Cancer cells can use this to avoid being attacked by the immune system."
+  },
+  {
+    "target_id": "CHEMBL2095",
+    "gene_symbol": "ALK",
+    "name": "ALK tyrosine kinase receptor",
+    "organism": "Homo sapiens",
+    "target_class": "Kinase",
+    "druggability": 0.87,
+    "disease_areas": ["Non-small cell lung cancer", "Neuroblastoma"],
+    "approved_drugs": 5,
+    "description": "ALK is a receptor tyrosine kinase that plays a role in nervous system development. ALK rearrangements are found in about 5% of non-small cell lung cancers."
+  },
+  {
+    "target_id": "CHEMBL4179",
+    "gene_symbol": "VEGFR2",
+    "name": "Vascular endothelial growth factor receptor 2",
+    "organism": "Homo sapiens",
+    "target_class": "Kinase",
+    "druggability": 0.93,
+    "disease_areas": ["Renal cell carcinoma", "Hepatocellular carcinoma", "Thyroid cancer"],
+    "approved_drugs": 12,
+    "description": "VEGFR2 is a major mediator of VEGF-induced endothelial cell proliferation, survival, migration, and angiogenesis."
+  },
+  {
+    "target_id": "CHEMBL4005",
+    "gene_symbol": "JAK2",
+    "name": "Tyrosine-protein kinase JAK2",
+    "organism": "Homo sapiens",
+    "target_class": "Kinase",
+    "druggability": 0.89,
+    "disease_areas": ["Myeloproliferative neoplasms", "Polycythemia vera"],
+    "approved_drugs": 4,
+    "description": "JAK2 is a member of the Janus family of tyrosine kinases. The JAK2 V617F mutation is found in most patients with polycythemia vera."
+  },
+  {
+    "target_id": "CHEMBL5247",
+    "gene_symbol": "MEK1",
+    "name": "Dual specificity mitogen-activated protein kinase kinase 1",
+    "organism": "Homo sapiens",
+    "target_class": "Kinase",
+    "druggability": 0.86,
+    "disease_areas": ["Melanoma", "Non-small cell lung cancer"],
+    "approved_drugs": 3,
+    "description": "MEK1 is a kinase that activates ERK1 and ERK2. It is part of the RAS/RAF/MEK/ERK signaling pathway that is frequently mutated in cancer."
+  },
+  {
+    "target_id": "CHEMBL3524",
+    "gene_symbol": "PI3K",
+    "name": "Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit alpha",
+    "organism": "Homo sapiens",
+    "target_class": "Kinase",
+    "druggability": 0.85,
+    "disease_areas": ["Breast cancer", "Ovarian cancer", "Endometrial cancer"],
+    "approved_drugs": 4,
+    "description": "PI3K is a family of enzymes involved in cellular functions such as cell growth, proliferation, differentiation and survival."
+  },
+  {
+    "target_id": "CHEMBL2716",
+    "gene_symbol": "mTOR",
+    "name": "Serine/threonine-protein kinase mTOR",
+    "organism": "Homo sapiens",
+    "target_class": "Kinase",
+    "druggability": 0.88,
+    "disease_areas": ["Renal cell carcinoma", "Breast cancer", "Tuberous sclerosis"],
+    "approved_drugs": 5,
+    "description": "mTOR is a serine/threonine kinase that regulates cell growth, cell proliferation, cell motility, cell survival, protein synthesis, autophagy, and transcription."
+  }
+]
