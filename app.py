@@ -317,13 +317,14 @@ def main():
     st.divider()
     
     # 功能标签页
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
         "🎯 虚拟筛选", 
         "🧬 分子生成", 
         "💊 ADMET预测",
         "🔬 分子可视化",
         "💊 药物重定位",
         "🕸️ 知识图谱",
+        "🏥 临床试验",
         "📊 数据浏览",
         "🔄 全流程演示"
     ])
@@ -661,8 +662,110 @@ def main():
             except Exception as e:
                 st.error(f"生成图谱失败: {e}")
     
-    # ===== Tab 7: 数据浏览 =====
+    # ===== Tab 7: 临床试验 =====
     with tab7:
+        st.header("临床试验模拟")
+        st.markdown("基于AI预测临床试验成功率和设计优化")
+        
+        # 输入参数
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            ct_smiles = st.text_input("药物SMILES", "CC(=O)OC1=CC=CC=C1C(=O)O", key="ct_smiles")
+            ct_target = st.text_input("靶点", "EGFR", key="ct_target")
+        
+        with col2:
+            ct_indication = st.text_input("适应症", "非小细胞肺癌", key="ct_indication")
+            ct_phase = st.selectbox("临床阶段", ["Phase I", "Phase II", "Phase III", "Phase IV"], key="ct_phase")
+        
+        if st.button("🏥 模拟临床试验", key="btn_clinical", use_container_width=True):
+            with st.spinner("正在模拟临床试验..."):
+                try:
+                    sys.path.insert(0, str(Path(__file__).parent / "src"))
+                    from clinical_trial import ClinicalTrialSimulator
+                    
+                    simulator = ClinicalTrialSimulator()
+                    
+                    # 设计临床试验
+                    design = simulator.design_trial(ct_smiles, ct_target, ct_indication, ct_phase)
+                    
+                    # 预测成功率
+                    prediction = simulator.predict_success(ct_smiles, ct_target, ct_indication, ct_phase)
+                    
+                    # 显示结果
+                    st.success("临床试验模拟完成!")
+                    
+                    # 显示设计
+                    st.subheader("临床试验设计")
+                    
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        st.metric("阶段", design.phase)
+                    with col2:
+                        st.metric("目标人群", design.target_population)
+                    with col3:
+                        st.metric("持续时间", f"{design.duration_weeks}周")
+                    with col4:
+                        st.metric("成功率", f"{prediction.success_probability*100:.1f}%")
+                    
+                    # 显示详细信息
+                    st.subheader("试验详情")
+                    
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.markdown("**主要终点**")
+                        st.info(design.primary_endpoint)
+                        
+                        st.markdown("**次要终点**")
+                        for endpoint in design.secondary_endpoints:
+                            st.markdown(f"- {endpoint}")
+                    
+                    with col2:
+                        st.markdown("**给药方案**")
+                        st.info(design.dosing_regimen)
+                        
+                        st.markdown("**纳入标准**")
+                        for criteria in design.inclusion_criteria:
+                            st.markdown(f"- {criteria}")
+                    
+                    # 显示风险因素
+                    if prediction.risk_factors:
+                        st.subheader("风险因素")
+                        for risk in prediction.risk_factors:
+                            st.warning(risk)
+                    
+                    # 显示建议
+                    if prediction.recommendations:
+                        st.subheader("优化建议")
+                        for rec in prediction.recommendations:
+                            st.info(rec)
+                    
+                    # 优化设计
+                    st.subheader("多阶段优化分析")
+                    optimization = simulator.optimize_design(ct_smiles, ct_target, ct_indication)
+                    
+                    # 显示各阶段成功率
+                    phases = list(optimization["predictions"].keys())
+                    probabilities = list(optimization["predictions"].values())
+                    
+                    import pandas as pd
+                    df = pd.DataFrame({
+                        "阶段": phases,
+                        "成功率": [f"{p*100:.1f}%" for p in probabilities]
+                    })
+                    st.dataframe(df, use_container_width=True)
+                    
+                    st.metric("总体成功率", f"{optimization['overall_success_rate']*100:.1f}%")
+                    
+                    st.markdown("**推荐起始阶段**")
+                    st.success(optimization["recommended_start_phase"])
+                    
+                except Exception as e:
+                    st.error(f"临床试验模拟失败: {e}")
+    
+    # ===== Tab 8: 数据浏览 =====
+    with tab8:
         st.header("数据浏览")
         st.markdown("浏览本地化合物库和靶点库")
         
@@ -682,8 +785,8 @@ def main():
                 st.dataframe(df, use_container_width=True)
                 st.caption(f"共 {len(targets)} 个靶点")
     
-    # ===== Tab 8: 全流程演示 =====
-    with tab8:
+    # ===== Tab 9: 全流程演示 =====
+    with tab9:
         st.header("全流程演示")
         st.markdown("展示完整的药物发现流程")
         
