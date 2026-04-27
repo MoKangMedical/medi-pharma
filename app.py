@@ -317,7 +317,7 @@ def main():
     st.divider()
     
     # 功能标签页
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12, tab13, tab14, tab15 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12, tab13, tab14, tab15, tab16 = st.tabs([
         "🎯 虚拟筛选", 
         "🧬 分子生成", 
         "💊 ADMET预测",
@@ -331,6 +331,7 @@ def main():
         "🎯 多靶点设计",
         "⚗️ 药物优化",
         "🔍 药物筛选",
+        "🎨 药物设计",
         "📊 数据浏览",
         "🔄 全流程演示"
     ])
@@ -1444,8 +1445,137 @@ def main():
                 except Exception as e:
                     st.error(f"药物筛选失败: {e}")
     
-    # ===== Tab 14: 数据浏览 =====
+    # ===== Tab 14: 药物设计 =====
     with tab14:
+        st.header("药物设计")
+        st.markdown("基于AI设计新型药物分子")
+        
+        # 输入参数
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            design_target = st.selectbox(
+                "靶点",
+                ["EGFR", "HER2", "BRAF", "KRAS", "PI3K", "mTOR", "JAK1", "JAK2", "VEGFR", "PDGFR"],
+                key="design_target"
+            )
+            design_strategy = st.selectbox(
+                "设计策略",
+                ["基于骨架的设计", "基于片段的设计", "基于药效团的设计", "基于QSAR的设计", "基于深度学习的设计"],
+                key="design_strategy"
+            )
+        
+        with col2:
+            design_n = st.slider("设计数量", 1, 20, 5, key="design_n")
+            design_action = st.selectbox("操作", ["设计药物", "分析设计", "优化设计"], key="design_action")
+        
+        if st.button("🎨 设计药物", key="btn_design", use_container_width=True):
+            with st.spinner("正在设计药物..."):
+                try:
+                    sys.path.insert(0, str(Path(__file__).parent / "src"))
+                    from drug_designer import DrugDesigner
+                    
+                    designer = DrugDesigner()
+                    
+                    if design_action == "设计药物":
+                        # 设计药物
+                        designs = designer.design_drug(design_target, design_strategy, design_n)
+                        
+                        # 显示结果
+                        st.success(f"设计完成! 生成 {len(designs)} 个候选药物")
+                        
+                        # 显示结果
+                        for i, design in enumerate(designs):
+                            with st.expander(f"设计 {i+1}: {design.designed_smiles[:30]}..."):
+                                col1, col2, col3 = st.columns(3)
+                                with col1:
+                                    st.metric("设计分数", f"{design.design_score*100:.1f}%")
+                                with col2:
+                                    st.metric("方法", design.method)
+                                with col3:
+                                    st.metric("靶点", design.target)
+                                
+                                # 显示属性
+                                st.subheader("预测属性")
+                                for key, value in design.predicted_properties.items():
+                                    st.metric(key, value)
+                                
+                                # 显示SMILES
+                                st.code(design.designed_smiles)
+                    
+                    elif design_action == "分析设计":
+                        # 分析设计
+                        analysis = designer.analyze_design(
+                            "CC(=O)OC1=CC=CC=C1C(=O)O",
+                            design_target
+                        )
+                        
+                        if "error" in analysis:
+                            st.error(analysis["error"])
+                        else:
+                            # 显示分析结果
+                            st.success("分析完成!")
+                            
+                            # 显示属性
+                            st.subheader("分子属性")
+                            
+                            props = analysis["properties"]
+                            col1, col2, col3, col4, col5 = st.columns(5)
+                            with col1:
+                                st.metric("分子量", props["molecular_weight"])
+                            with col2:
+                                st.metric("LogP", props["logp"])
+                            with col3:
+                                st.metric("HBD", props["hbd"])
+                            with col4:
+                                st.metric("HBA", props["hba"])
+                            with col5:
+                                st.metric("QED", props["qed"])
+                            
+                            # 显示设计分数
+                            st.metric("设计分数", f"{analysis['design_score']*100:.1f}%")
+                            
+                            # 显示是否类药性
+                            if analysis["is_drug_like"]:
+                                st.success("✅ 具有类药性")
+                            else:
+                                st.warning("⚠️ 类药性需要优化")
+                            
+                            # 显示建议
+                            st.subheader("优化建议")
+                            for rec in analysis["recommendations"]:
+                                st.info(rec)
+                    
+                    else:  # 优化设计
+                        # 优化设计
+                        optimizations = designer.optimize_design(
+                            "CC(=O)OC1=CC=CC=C1C(=O)O",
+                            design_target,
+                            design_n
+                        )
+                        
+                        # 显示结果
+                        st.success(f"优化完成! 进行 {len(optimizations)} 次迭代")
+                        
+                        # 显示优化过程
+                        for i, opt in enumerate(optimizations):
+                            with st.expander(f"迭代 {i+1}: {opt.designed_smiles[:30]}..."):
+                                col1, col2 = st.columns(2)
+                                with col1:
+                                    st.metric("设计分数", f"{opt.design_score*100:.1f}%")
+                                with col2:
+                                    st.metric("方法", opt.method)
+                                
+                                # 显示属性
+                                st.subheader("预测属性")
+                                for key, value in opt.predicted_properties.items():
+                                    st.metric(key, value)
+                    
+                except Exception as e:
+                    st.error(f"药物设计失败: {e}")
+    
+    # ===== Tab 15: 数据浏览 =====
+    with tab15:
         st.header("数据浏览")
         st.markdown("浏览本地化合物库和靶点库")
         
@@ -1465,8 +1595,8 @@ def main():
                 st.dataframe(df, use_container_width=True)
                 st.caption(f"共 {len(targets)} 个靶点")
     
-    # ===== Tab 15: 全流程演示 =====
-    with tab15:
+    # ===== Tab 16: 全流程演示 =====
+    with tab16:
         st.header("全流程演示")
         st.markdown("展示完整的药物发现流程")
         
