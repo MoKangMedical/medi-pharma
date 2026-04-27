@@ -317,7 +317,7 @@ def main():
     st.divider()
     
     # 功能标签页
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs([
         "🎯 虚拟筛选", 
         "🧬 分子生成", 
         "💊 ADMET预测",
@@ -325,6 +325,7 @@ def main():
         "💊 药物重定位",
         "🕸️ 知识图谱",
         "🏥 临床试验",
+        "📋 监管合规",
         "📊 数据浏览",
         "🔄 全流程演示"
     ])
@@ -764,8 +765,92 @@ def main():
                 except Exception as e:
                     st.error(f"临床试验模拟失败: {e}")
     
-    # ===== Tab 8: 数据浏览 =====
+    # ===== Tab 8: 监管合规 =====
     with tab8:
+        st.header("监管合规")
+        st.markdown("基于FDA/EMA/NMPA指南的合规检查和文档生成")
+        
+        # 输入参数
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            reg_smiles = st.text_input("药物SMILES", "CC(=O)OC1=CC=CC=C1C(=O)O", key="reg_smiles")
+            reg_target = st.text_input("靶点", "EGFR", key="reg_target")
+        
+        with col2:
+            reg_indication = st.text_input("适应症", "非小细胞肺癌", key="reg_indication")
+            reg_doc_type = st.selectbox("文档类型", ["IND", "NDA", "BLA"], key="reg_doc_type")
+        
+        if st.button("📋 检查合规性", key="btn_regulatory", use_container_width=True):
+            with st.spinner("正在检查合规性..."):
+                try:
+                    sys.path.insert(0, str(Path(__file__).parent / "src"))
+                    from regulatory import RegulatoryCompliance
+                    
+                    reg_engine = RegulatoryCompliance()
+                    
+                    # 获取合规性摘要
+                    summary = reg_engine.get_compliance_summary(reg_smiles, reg_target, reg_indication)
+                    
+                    # 显示结果
+                    st.success("合规性检查完成!")
+                    
+                    # 显示摘要
+                    st.subheader("合规性摘要")
+                    
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        st.metric("总检查项", summary["total_checks"])
+                    with col2:
+                        st.metric("通过", summary["pass_count"])
+                    with col3:
+                        st.metric("警告", summary["warning_count"])
+                    with col4:
+                        st.metric("合规分数", f"{summary['compliance_score']*100:.1f}%")
+                    
+                    # 显示合规状态
+                    if summary["is_compliant"]:
+                        st.success("✅ 合规性检查通过")
+                    else:
+                        st.error("❌ 合规性检查未通过")
+                    
+                    # 显示详细检查
+                    st.subheader("详细检查")
+                    
+                    for check in summary["checks"]:
+                        if check.status == "pass":
+                            st.success(f"**{check.check_name}**: {check.details}")
+                        elif check.status == "warning":
+                            st.warning(f"**{check.check_name}**: {check.details}")
+                            for rec in check.recommendations:
+                                st.markdown(f"- {rec}")
+                        else:
+                            st.error(f"**{check.check_name}**: {check.details}")
+                            for rec in check.recommendations:
+                                st.markdown(f"- {rec}")
+                    
+                    # 生成监管文档
+                    st.subheader("监管文档")
+                    
+                    doc = reg_engine.generate_regulatory_document(
+                        reg_smiles, reg_target, reg_indication, reg_doc_type
+                    )
+                    
+                    st.text_area("文档内容", doc.content, height=400, key="reg_doc_content")
+                    
+                    # 下载文档
+                    st.download_button(
+                        "📥 下载文档",
+                        doc.content,
+                        f"{reg_doc_type}_document.md",
+                        "text/markdown"
+                    )
+                    
+                except Exception as e:
+                    st.error(f"监管合规检查失败: {e}")
+    
+    # ===== Tab 9: 数据浏览 =====
+    with tab9:
         st.header("数据浏览")
         st.markdown("浏览本地化合物库和靶点库")
         
@@ -785,8 +870,8 @@ def main():
                 st.dataframe(df, use_container_width=True)
                 st.caption(f"共 {len(targets)} 个靶点")
     
-    # ===== Tab 9: 全流程演示 =====
-    with tab9:
+    # ===== Tab 10: 全流程演示 =====
+    with tab10:
         st.header("全流程演示")
         st.markdown("展示完整的药物发现流程")
         
