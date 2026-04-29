@@ -1,6 +1,6 @@
 fastapi==0.115.0
 uvicorn[standard]==0.30.0
-pydantic==2.9.0
+pydantic==2.13.1
 rdkit-pypi==2024.3.5
 deepchem==2.8.0
 torch>=2.0.0
