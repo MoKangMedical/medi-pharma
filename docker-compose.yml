@@ -1,12 +1,23 @@
 version: '3.8'
 
 services:
-  app:
-    build: .
+  medi-pharma:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: medi-pharma
     ports:
-      - "8000:8000"
+      - "8002:8095"
     volumes:
       - ./data:/app/data
+      - ./screening_results:/app/screening_results
     environment:
       - PYTHONUNBUFFERED=1
+      - MEDIPHARMA_PORT=8000
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8095/health')"]
+      interval: 30s
+      timeout: 10s
+      start_period: 120s
+      retries: 3
